@@ -80,10 +80,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "theme-color", content: "#0a0a0a" },
       { title: "Maison Oudh — Crafted for those who speak without words" },
       { name: "description", content: "Maison Oudh — luxury Arabic oud, designer & limited edition perfumes. Free delivery across Mumbai on orders above ₹999." },
-      { property: "og:title", content: "Maison Oudh — Luxury Perfumery" },
-      { property: "og:description", content: "Arabic oud, designer luxury, limited edition fragrances. Free delivery across Mumbai." },
+      { property: "og:title", content: "Maison Oudh — Crafted for those who speak without words" },
+      { property: "og:description", content: "Maison Oudh — luxury Arabic oud, designer & limited edition perfumes. Free delivery across Mumbai on orders above ₹999." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Maison Oudh — Crafted for those who speak without words" },
+      { name: "twitter:description", content: "Maison Oudh — luxury Arabic oud, designer & limited edition perfumes. Free delivery across Mumbai on orders above ₹999." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/6a8daf4a-7c08-455f-a970-11770dfe7151/id-preview-76ab2023--2f787c4d-f47b-4351-b4ea-87286d080d45.lovable.app-1782320657895.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/6a8daf4a-7c08-455f-a970-11770dfe7151/id-preview-76ab2023--2f787c4d-f47b-4351-b4ea-87286d080d45.lovable.app-1782320657895.png" },
     ],
     links: [
       {
