@@ -1,29 +1,40 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { LoadingScreen } from "@/components/luxe/LoadingScreen";
+import { Nav } from "@/components/luxe/Nav";
+import { Hero } from "@/components/luxe/Hero";
+import { Collections } from "@/components/luxe/Collections";
+import { BestSellers } from "@/components/luxe/BestSellers";
+import { ScentStory } from "@/components/luxe/ScentStory";
+import { OrderForm } from "@/components/luxe/OrderForm";
+import { Reviews } from "@/components/luxe/Reviews";
+import { Footer } from "@/components/luxe/Footer";
+import { FloatingButtons } from "@/components/luxe/FloatingButtons";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "Maison Oudh — Luxury Perfumery, Mumbai" },
+      { name: "description", content: "Arabic oud, designer luxury, fresh & floral, woody, and limited edition perfumes. Free delivery across Mumbai on orders above ₹999." },
+      { property: "og:title", content: "Maison Oudh — Crafted for those who speak without words" },
+      { property: "og:description", content: "Luxury perfumery delivered across Mumbai." },
     ],
   }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <main className="min-h-screen bg-[#0a0a0a] text-[#f5f0e8]">
+      <LoadingScreen />
+      <Nav />
+      <Hero />
+      <Collections />
+      <BestSellers />
+      <ScentStory />
+      <OrderForm />
+      <Reviews />
+      <Footer />
+      <FloatingButtons />
+    </main>
   );
 }
