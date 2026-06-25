@@ -28,9 +28,9 @@ function Index() {
       <LoadingScreen />
       <Nav />
       <Hero />
+      <ScentStory />
       <Collections />
       <BestSellers />
-      <ScentStory />
       <OrderForm />
       <Reviews />
       <Footer />
