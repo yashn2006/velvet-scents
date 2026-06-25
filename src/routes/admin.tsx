@@ -52,13 +52,13 @@ function LoginGate({ onAuth }: { onAuth: () => void }) {
   );
 }
 
-const NAV = [
+const NAV: { to: string; label: string; exact?: boolean }[] = [
   { to: "/admin", label: "Dashboard", exact: true },
   { to: "/admin/orders", label: "Orders" },
   { to: "/admin/customers", label: "Customers" },
   { to: "/admin/inventory", label: "Inventory" },
   { to: "/admin/analytics", label: "Analytics" },
-] as const;
+];
 
 function Shell({ onLogout }: { onLogout: () => void }) {
   const router = useRouter();
