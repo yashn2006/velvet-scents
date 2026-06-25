@@ -1,12 +1,22 @@
 import { useEffect, useRef, useCallback } from "react";
-import bottle1 from "@/assets/bottle-1.png";
-import bottle2 from "@/assets/bottle-2.png";
-import bottle3 from "@/assets/bottle-3.png";
+import khamrahWaha from "@/assets/bottles/khamrah-waha.png";
+import acquaProfumo from "@/assets/bottles/acqua-profumo.png";
+import clubDeNuit from "@/assets/bottles/club-de-nuit.png";
+import acquaParfum from "@/assets/bottles/acqua-parfum.png";
+import oudForGlory from "@/assets/bottles/oud-for-glory.png";
+import sauvageElixir from "@/assets/bottles/sauvage-elixir.png";
 import { SHOP } from "@/lib/products";
 
-const RING_BOTTLES = [bottle1, bottle2, bottle3, bottle1, bottle2, bottle3];
+const RING_BOTTLES = [
+  { src: khamrahWaha, name: "Lattafa Khamrah Waha" },
+  { src: acquaProfumo, name: "Armani Acqua di Gio Profumo" },
+  { src: clubDeNuit, name: "Armaf Club de Nuit Intense Man" },
+  { src: acquaParfum, name: "Armani Acqua di Gio Parfum" },
+  { src: oudForGlory, name: "Lattafa Oud For Glory" },
+  { src: sauvageElixir, name: "Dior Sauvage Elixir" },
+];
 const STEP = 360 / RING_BOTTLES.length; // 60deg
-const RING_RADIUS = 280; // px
+const RING_RADIUS = 380; // px — wider orbit
 
 export function Hero() {
   const leftCurtainRef = useRef<HTMLDivElement>(null);
