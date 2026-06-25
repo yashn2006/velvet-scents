@@ -1,12 +1,22 @@
 import { useEffect, useRef, useCallback } from "react";
-import bottle1 from "@/assets/bottle-1.png";
-import bottle2 from "@/assets/bottle-2.png";
-import bottle3 from "@/assets/bottle-3.png";
+import khamrahWaha from "@/assets/bottles/khamrah-waha.png";
+import acquaProfumo from "@/assets/bottles/acqua-profumo.png";
+import clubDeNuit from "@/assets/bottles/club-de-nuit.png";
+import acquaParfum from "@/assets/bottles/acqua-parfum.png";
+import oudForGlory from "@/assets/bottles/oud-for-glory.png";
+import sauvageElixir from "@/assets/bottles/sauvage-elixir.png";
 import { SHOP } from "@/lib/products";
 
-const RING_BOTTLES = [bottle1, bottle2, bottle3, bottle1, bottle2, bottle3];
+const RING_BOTTLES = [
+  { src: khamrahWaha, name: "Lattafa Khamrah Waha" },
+  { src: acquaProfumo, name: "Armani Acqua di Gio Profumo" },
+  { src: clubDeNuit, name: "Armaf Club de Nuit Intense Man" },
+  { src: acquaParfum, name: "Armani Acqua di Gio Parfum" },
+  { src: oudForGlory, name: "Lattafa Oud For Glory" },
+  { src: sauvageElixir, name: "Dior Sauvage Elixir" },
+];
 const STEP = 360 / RING_BOTTLES.length; // 60deg
-const RING_RADIUS = 280; // px
+const RING_RADIUS = 380; // px — wider orbit
 
 export function Hero() {
   const leftCurtainRef = useRef<HTMLDivElement>(null);
@@ -142,7 +152,7 @@ export function Hero() {
           to   { transform: rotateY(360deg); }
         }
         .maison-ring-spin {
-          animation: maison-ring-spin 11s linear infinite;
+          animation: maison-ring-spin 20s linear infinite;
           transform-style: preserve-3d;
           will-change: transform;
         }
@@ -153,10 +163,10 @@ export function Hero() {
       {/* 3D rotating ring of bottles (globe / ferris-wheel spin) */}
       <div
         ref={stageRef}
-        className="absolute inset-x-0 bottom-[6vh] z-10 flex items-end justify-center"
+        className="absolute inset-x-0 bottom-[4vh] z-10 flex items-end justify-center"
         style={{ perspective: "1000px" }}
       >
-        <div className="relative h-[60vh] w-full max-w-[1100px] md:h-[70vh]">
+        <div className="relative mx-auto h-[500px] w-full max-w-[1100px] md:h-[560px]" style={{ minWidth: 320 }}>
           {/* nudge wrapper — GSAP rotates this on click/swipe */}
           <div
             ref={nudgeRef}
@@ -165,7 +175,7 @@ export function Hero() {
           >
             {/* pure-CSS infinite spinning ring */}
             <div ref={ringRef} className="maison-ring-spin absolute inset-0">
-              {RING_BOTTLES.map((src, i) => {
+              {RING_BOTTLES.map((b, i) => {
                 const angle = i * STEP;
                 return (
                   <div
@@ -185,18 +195,25 @@ export function Hero() {
                       }}
                     >
                       <img
-                        src={src}
-                        alt=""
+                        src={b.src}
+                        alt={b.name}
                         draggable={false}
-                        className="h-[40vh] w-auto select-none md:h-[48vh]"
-                        style={{ filter: "drop-shadow(0 30px 40px rgba(0,0,0,0.6))" }}
+                        className="select-none"
+                        style={{
+                          width: 220,
+                          height: 380,
+                          objectFit: "contain",
+                          filter: "drop-shadow(0 30px 40px rgba(0,0,0,0.6))",
+                        }}
                       />
                       <div
-                        className="-mt-3 h-8 w-[65%] rounded-[50%]"
+                        className="-mt-2 rounded-[50%]"
                         style={{
+                          width: 220,
+                          height: 44,
                           background:
                             "radial-gradient(ellipse at center, rgba(201,168,76,0.55), transparent 70%)",
-                          filter: "blur(6px)",
+                          filter: "blur(8px)",
                         }}
                       />
                     </div>
