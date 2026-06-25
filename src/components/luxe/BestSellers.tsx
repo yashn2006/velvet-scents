@@ -74,7 +74,7 @@ export function BestSellers() {
                         {([50, 100] as const).map((s) => (
                           <button
                             key={s}
-                            onClick={() => setSizes((m) => ({ ...m, [p.id]: s }))}
+                            onClick={(e) => { e.stopPropagation(); setSizes((m) => ({ ...m, [p.id]: s })); }}
                             className={`font-accent rounded-sm border px-2.5 py-1 text-[10px] transition-colors ${
                               size === s
                                 ? "border-[#c9a84c] text-[#c9a84c]"
