@@ -71,7 +71,7 @@ export function Hero() {
       tl.to(leftCurtainRef.current, { xPercent: -100, duration: 1.4, ease: "power3.inOut" }, 0)
         .to(rightCurtainRef.current, { xPercent: 100, duration: 1.4, ease: "power3.inOut" }, 0);
 
-      gsap.from(stageRef.current, {
+      tl.from(stageRef.current, {
         opacity: 0, y: 80, duration: 1.4, ease: "power3.out",
       }, 0.6);
 
