@@ -1,8 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import bottle1 from "@/assets/bottle-1.png";
 import bottle2 from "@/assets/bottle-2.png";
 import bottle3 from "@/assets/bottle-3.png";
 import { SHOP } from "@/lib/products";
+
+const CAROUSEL_BOTTLES = [bottle1, bottle2, bottle3, bottle1, bottle2, bottle3];
+const STEP = 360 / CAROUSEL_BOTTLES.length; // 60deg
 
 export function Hero() {
   const leftCurtainRef = useRef<HTMLDivElement>(null);
@@ -11,7 +14,12 @@ export function Hero() {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const taglineRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
-  const bottlesRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
+  const rotationRef = useRef(0);
+  const pauseUntilRef = useRef(0);
+  const gsapRef = useRef<typeof import("gsap")["gsap"] | null>(null);
+  const [index, setIndex] = useState(0);
 
   useEffect(() => {
     let raf = 0;
@@ -21,6 +29,7 @@ export function Hero() {
     (async () => {
       const { gsap } = await import("gsap");
       if (cancelled) return;
+      gsapRef.current = gsap;
 
       const canvas = canvasRef.current!;
       const ctx = canvas.getContext("2d")!;
@@ -62,16 +71,9 @@ export function Hero() {
       tl.to(leftCurtainRef.current, { xPercent: -100, duration: 1.4, ease: "power3.inOut" }, 0)
         .to(rightCurtainRef.current, { xPercent: 100, duration: 1.4, ease: "power3.inOut" }, 0);
 
-      const bottles = bottlesRef.current?.querySelectorAll<HTMLImageElement>(".bottle") ?? [];
-      gsap.set(bottles, { y: 120, opacity: 0, rotate: (i: number) => (i % 2 === 0 ? -8 : 8) });
-      tl.to(bottles, {
-        y: 0, opacity: 1, rotate: 0,
-        duration: 1.4, stagger: 0.3, ease: "power3.out",
-      }, 0.6).add(() => {
-        bottles.forEach((b, i) => {
-          gsap.to(b, { y: -12, duration: 3, repeat: -1, yoyo: true, ease: "sine.inOut", delay: i * 0.2 });
-        });
-      });
+      tl.from(stageRef.current, {
+        opacity: 0, y: 80, duration: 1.4, ease: "power3.out",
+      }, 0.6);
 
       const title = titleRef.current;
       if (title) {
@@ -97,15 +99,143 @@ export function Hero() {
     };
   }, []);
 
+  const rotate = useCallback((dir: 1 | -1) => {
+    const gsap = gsapRef.current;
+    rotationRef.current -= dir * STEP;
+    setIndex((i) => (i + dir + CAROUSEL_BOTTLES.length) % CAROUSEL_BOTTLES.length);
+    if (gsap && ringRef.current) {
+      gsap.to(ringRef.current, {
+        rotateY: rotationRef.current,
+        duration: 0.8,
+        ease: "power2.inOut",
+      });
+    }
+  }, []);
+
+  const manualRotate = useCallback((dir: 1 | -1) => {
+    pauseUntilRef.current = Date.now() + 4000;
+    rotate(dir);
+  }, [rotate]);
+
+  // Auto-rotate every 2.5s
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (Date.now() < pauseUntilRef.current) return;
+      rotate(1);
+    }, 2500);
+    return () => clearInterval(id);
+  }, [rotate]);
+
+  // Swipe support
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    let startX = 0;
+    let active = false;
+    const onStart = (e: TouchEvent) => { startX = e.touches[0].clientX; active = true; };
+    const onEnd = (e: TouchEvent) => {
+      if (!active) return;
+      active = false;
+      const dx = e.changedTouches[0].clientX - startX;
+      if (Math.abs(dx) > 40) manualRotate(dx < 0 ? 1 : -1);
+    };
+    el.addEventListener("touchstart", onStart, { passive: true });
+    el.addEventListener("touchend", onEnd);
+    return () => {
+      el.removeEventListener("touchstart", onStart);
+      el.removeEventListener("touchend", onEnd);
+    };
+  }, [manualRotate]);
+
   return (
     <section className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-[#0a0a0a]">
       <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 h-full w-full" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#0a0a0a_85%)]" />
 
-      <div ref={bottlesRef} className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-center gap-2 md:gap-16">
-        <img src={bottle2} alt="" className="bottle h-[35vh] w-auto translate-y-6 opacity-80 md:h-[55vh]" />
-        <img src={bottle1} alt="" className="bottle h-[50vh] w-auto md:h-[70vh]" />
-        <img src={bottle3} alt="" className="bottle h-[35vh] w-auto translate-y-6 opacity-80 md:h-[55vh]" />
+      {/* 3D circular bottle carousel */}
+      <div
+        ref={stageRef}
+        className="absolute inset-x-0 bottom-[6vh] z-10 flex items-end justify-center"
+        style={{ perspective: "1200px" }}
+      >
+        <div className="relative h-[60vh] w-full max-w-[1100px] md:h-[70vh]">
+          <div
+            ref={ringRef}
+            className="absolute inset-0"
+            style={{ transformStyle: "preserve-3d" }}
+          >
+            {CAROUSEL_BOTTLES.map((src, i) => {
+              const angle = i * STEP;
+              // diff to front (0deg): normalize to [-180, 180]
+              let diff = ((i - index) * STEP) % 360;
+              if (diff > 180) diff -= 360;
+              if (diff < -180) diff += 360;
+              const abs = Math.abs(diff);
+              let scale = 0.4;
+              let opacity = 0;
+              let tz = 0;
+              if (abs < 1) { scale = 1.2; opacity = 1; tz = 320; }
+              else if (abs < 61) { scale = 0.85; opacity = 0.7; tz = 180; }
+              else if (abs < 121) { scale = 0.6; opacity = 0.3; tz = 0; }
+              return (
+                <div
+                  key={i}
+                  className="absolute left-1/2 bottom-0 flex flex-col items-center"
+                  style={{
+                    transform: `translateX(-50%) rotateY(${angle}deg) translateZ(320px)`,
+                    transformStyle: "preserve-3d",
+                  }}
+                >
+                  <div
+                    className="flex flex-col items-center transition-[transform,opacity] duration-700 ease-out"
+                    style={{
+                      transform: `translateZ(${tz - 320}px) scale(${scale})`,
+                      opacity,
+                    }}
+                  >
+                    <img
+                      src={src}
+                      alt=""
+                      draggable={false}
+                      className="h-[45vh] w-auto select-none md:h-[55vh]"
+                      style={{ filter: `drop-shadow(0 30px 40px rgba(0,0,0,0.6))` }}
+                    />
+                    <div
+                      className="-mt-4 h-10 w-[60%] rounded-[50%]"
+                      style={{
+                        background:
+                          "radial-gradient(ellipse at center, rgba(201,168,76,0.45), transparent 70%)",
+                        filter: "blur(6px)",
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* arrows */}
+          <button
+            type="button"
+            aria-label="Previous bottle"
+            onClick={() => manualRotate(-1)}
+            className="group absolute left-2 top-1/2 z-20 -translate-y-1/2 rounded-full border border-[#c9a84c]/40 bg-black/40 p-3 text-[#c9a84c] backdrop-blur-sm transition-all hover:scale-110 hover:bg-black/70 hover:text-[#f5d97a] md:left-6 md:p-4"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M15 6l-6 6 6 6" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            aria-label="Next bottle"
+            onClick={() => manualRotate(1)}
+            className="group absolute right-2 top-1/2 z-20 -translate-y-1/2 rounded-full border border-[#c9a84c]/40 bg-black/40 p-3 text-[#c9a84c] backdrop-blur-sm transition-all hover:scale-110 hover:bg-black/70 hover:text-[#f5d97a] md:right-6 md:p-4"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M9 6l6 6-6 6" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div className="pointer-events-none absolute bottom-0 left-1/2 h-[60vh] w-[80vw] max-w-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse,rgba(201,168,76,0.18),transparent_70%)]" />
