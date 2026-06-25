@@ -15,6 +15,12 @@ export interface Product {
   rating: number;
   reviews: number;
   notes: { top: string[]; heart: string[]; base: string[] };
+  originalBrandName?: string;
+  shortDescription?: string;
+  originalPrice50?: number;
+  originalPrice100?: number;
+  inspiredPrice50?: number;
+  inspiredPrice100?: number;
 }
 
 export const products: Product[] = [
