@@ -177,6 +177,19 @@ export function OrderForm() {
             </Field>
           </Grid>
 
+          <Field label="Version">
+            <div className="flex gap-2">
+              {(["Original", "Inspired"] as const).map((v) => (
+                <button type="button" key={v} onClick={() => set("version", v)}
+                  className={`font-accent flex-1 rounded-sm border px-4 py-3 text-[11px] tracking-[0.3em] transition-colors ${
+                    form.version === v ? "border-[#c9a84c] bg-[#c9a84c]/10 text-[#c9a84c]" : "border-[#2a2a2a] text-[#9a9285]"
+                  }`}>
+                  {v.toUpperCase()}
+                </button>
+              ))}
+            </div>
+          </Field>
+
           <Grid>
             <Field label="Size">
               <div className="flex gap-2">
@@ -185,7 +198,12 @@ export function OrderForm() {
                     className={`font-accent flex-1 rounded-sm border px-4 py-3 text-[11px] transition-colors ${
                       form.size === s ? "border-[#c9a84c] bg-[#c9a84c]/10 text-[#c9a84c]" : "border-[#2a2a2a] text-[#9a9285]"
                     }`}>
-                    {s}ml · ₹{(s === 50 ? product.price50 : product.price100).toLocaleString("en-IN")}
+                    {s}ml · ₹{(() => {
+                      if (form.version === "Original") {
+                        return (s === 50 ? (product.originalPrice50 ?? product.price50 * 4) : (product.originalPrice100 ?? product.price100 * 4));
+                      }
+                      return (s === 50 ? (product.inspiredPrice50 ?? product.price50) : (product.inspiredPrice100 ?? product.price100));
+                    })().toLocaleString("en-IN")}
                   </button>
                 ))}
               </div>
