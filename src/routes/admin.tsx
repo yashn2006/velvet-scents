@@ -75,7 +75,7 @@ function Shell({ onLogout }: { onLogout: () => void }) {
           {NAV.map((n) => {
             const active = n.exact ? pathname === n.to : pathname.startsWith(n.to);
             return (
-              <Link key={n.to} to={n.to}
+              <Link key={n.to} to={n.to as "/admin"}
                 className={`block rounded-sm px-3 py-2 text-sm transition-colors ${
                   active ? "bg-[#c9a84c]/10 text-[#c9a84c]" : "text-[#9a9285] hover:bg-white/5 hover:text-[#f5f0e8]"
                 }`}>
@@ -94,7 +94,7 @@ function Shell({ onLogout }: { onLogout: () => void }) {
         {NAV.map((n) => {
           const active = n.exact ? pathname === n.to : pathname.startsWith(n.to);
           return (
-            <Link key={n.to} to={n.to} className={`whitespace-nowrap text-xs ${active ? "text-[#c9a84c]" : "text-[#9a9285]"}`}>
+            <Link key={n.to} to={n.to as "/admin"} className={`whitespace-nowrap text-xs ${active ? "text-[#c9a84c]" : "text-[#9a9285]"}`}>
               {n.label}
             </Link>
           );
