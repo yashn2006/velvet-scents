@@ -13,6 +13,9 @@ function blank(): StockItem {
     name: "", brand: "Maison Oudh", category: "Arabic",
     image: "", price50: 2999, price100: 4999, rating: 5, reviews: 0,
     notes: { top: [], heart: [], base: [] },
+    originalBrandName: "", shortDescription: "",
+    originalPrice50: 12000, originalPrice100: 18000,
+    inspiredPrice50: 599, inspiredPrice100: 999,
     stock: 10, active: true,
   };
 }
@@ -102,17 +105,30 @@ function Editor({ item, onClose, onSave }: { item: StockItem; onClose: () => voi
 
         <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
           <label><span className={lbl}>NAME</span><input required className={input} value={it.name} onChange={(e) => setIt({ ...it, name: e.target.value })} /></label>
-          <label><span className={lbl}>BRAND</span><input className={input} value={it.brand} onChange={(e) => setIt({ ...it, brand: e.target.value })} /></label>
+          <label><span className={lbl}>BRAND (shop)</span><input className={input} value={it.brand} onChange={(e) => setIt({ ...it, brand: e.target.value })} /></label>
+          <label><span className={lbl}>ORIGINAL BRAND</span><input className={input} value={it.originalBrandName ?? ""} onChange={(e) => setIt({ ...it, originalBrandName: e.target.value })} /></label>
           <label><span className={lbl}>CATEGORY</span>
             <select className={input} value={it.category} onChange={(e) => setIt({ ...it, category: e.target.value as Category })}>
               {CATS.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </label>
           <label><span className={lbl}>STOCK</span><input type="number" min={0} className={input} value={it.stock} onChange={(e) => setIt({ ...it, stock: +e.target.value })} /></label>
-          <label><span className={lbl}>PRICE 50ml (₹)</span><input type="number" className={input} value={it.price50} onChange={(e) => setIt({ ...it, price50: +e.target.value })} /></label>
-          <label><span className={lbl}>PRICE 100ml (₹)</span><input type="number" className={input} value={it.price100} onChange={(e) => setIt({ ...it, price100: +e.target.value })} /></label>
           <label><span className={lbl}>RATING</span><input type="number" step="0.1" min={0} max={5} className={input} value={it.rating} onChange={(e) => setIt({ ...it, rating: +e.target.value })} /></label>
           <label><span className={lbl}>REVIEWS</span><input type="number" className={input} value={it.reviews} onChange={(e) => setIt({ ...it, reviews: +e.target.value })} /></label>
+        </div>
+
+        <div className="mt-6 grid grid-cols-2 gap-4 rounded-sm border border-[#c9a84c]/30 bg-[#0d0b06] p-4 md:grid-cols-4">
+          <div className="col-span-2 md:col-span-4 text-[10px] tracking-[0.3em] text-[#c9a84c]">ORIGINAL PRICES (₹)</div>
+          <label><span className={lbl}>ORIGINAL 50ml</span><input type="number" className={input} value={it.originalPrice50 ?? 0} onChange={(e) => setIt({ ...it, originalPrice50: +e.target.value })} /></label>
+          <label><span className={lbl}>ORIGINAL 100ml</span><input type="number" className={input} value={it.originalPrice100 ?? 0} onChange={(e) => setIt({ ...it, originalPrice100: +e.target.value })} /></label>
+          <label><span className={lbl}>INSPIRED 50ml</span><input type="number" className={input} value={it.inspiredPrice50 ?? it.price50} onChange={(e) => setIt({ ...it, inspiredPrice50: +e.target.value, price50: +e.target.value })} /></label>
+          <label><span className={lbl}>INSPIRED 100ml</span><input type="number" className={input} value={it.inspiredPrice100 ?? it.price100} onChange={(e) => setIt({ ...it, inspiredPrice100: +e.target.value, price100: +e.target.value })} /></label>
+        </div>
+
+        <div className="mt-4">
+          <label className="block"><span className={lbl}>SHORT DESCRIPTION</span>
+            <textarea rows={2} className={input} value={it.shortDescription ?? ""} onChange={(e) => setIt({ ...it, shortDescription: e.target.value })} />
+          </label>
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">

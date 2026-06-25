@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { MUMBAI_AREAS, SHOP, products } from "@/lib/products";
 
@@ -60,17 +60,42 @@ export function OrderForm() {
     area: "",
     productId: products[0].id,
     size: 50 as 50 | 100,
+    version: "Inspired" as "Original" | "Inspired",
     qty: 1,
     slot: "Morning (9am–1pm)",
     notes: "",
   });
 
   const product = useMemo(() => products.find((p) => p.id === form.productId)!, [form.productId]);
-  const unit = form.size === 50 ? product.price50 : product.price100;
+  const unit = (() => {
+    if (form.version === "Original") {
+      return form.size === 50
+        ? (product.originalPrice50 ?? product.price50 * 4)
+        : (product.originalPrice100 ?? product.price100 * 4);
+    }
+    return form.size === 50
+      ? (product.inspiredPrice50 ?? product.price50)
+      : (product.inspiredPrice100 ?? product.price100);
+  })();
   const total = unit * form.qty;
 
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ev = e as CustomEvent<{ productId: string; version: "Original" | "Inspired"; size: 50 | 100 }>;
+      if (!ev.detail) return;
+      setForm((f) => ({
+        ...f,
+        productId: ev.detail.productId,
+        version: ev.detail.version,
+        size: ev.detail.size,
+      }));
+    };
+    window.addEventListener("mo:order-prefill", handler as EventListener);
+    return () => window.removeEventListener("mo:order-prefill", handler as EventListener);
+  }, []);
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -89,7 +114,7 @@ export function OrderForm() {
 
     const order = {
       ...form,
-      productName: product.name,
+      productName: `${product.name} (${form.version})`,
       unit, total,
       createdAt: new Date().toISOString(),
       orderId: "MO-" + Date.now().toString(36).toUpperCase(),
@@ -107,7 +132,7 @@ export function OrderForm() {
       `Phone: ${form.phone}%0A` +
       `Area: ${form.area}%0A` +
       `Address: ${form.address}%0A` +
-      `Perfume: ${product.name} (${form.size}ml) x${form.qty}%0A` +
+      `Perfume: ${product.name} — ${form.version} (${form.size}ml) x${form.qty}%0A` +
       `Slot: ${form.slot}%0A` +
       `Total: ₹${total.toLocaleString("en-IN")}%0A` +
       (form.notes ? `Notes: ${form.notes}` : "");
@@ -152,6 +177,19 @@ export function OrderForm() {
             </Field>
           </Grid>
 
+          <Field label="Version">
+            <div className="flex gap-2">
+              {(["Original", "Inspired"] as const).map((v) => (
+                <button type="button" key={v} onClick={() => set("version", v)}
+                  className={`font-accent flex-1 rounded-sm border px-4 py-3 text-[11px] tracking-[0.3em] transition-colors ${
+                    form.version === v ? "border-[#c9a84c] bg-[#c9a84c]/10 text-[#c9a84c]" : "border-[#2a2a2a] text-[#9a9285]"
+                  }`}>
+                  {v.toUpperCase()}
+                </button>
+              ))}
+            </div>
+          </Field>
+
           <Grid>
             <Field label="Size">
               <div className="flex gap-2">
@@ -160,7 +198,12 @@ export function OrderForm() {
                     className={`font-accent flex-1 rounded-sm border px-4 py-3 text-[11px] transition-colors ${
                       form.size === s ? "border-[#c9a84c] bg-[#c9a84c]/10 text-[#c9a84c]" : "border-[#2a2a2a] text-[#9a9285]"
                     }`}>
-                    {s}ml · ₹{(s === 50 ? product.price50 : product.price100).toLocaleString("en-IN")}
+                    {s}ml · ₹{(() => {
+                      if (form.version === "Original") {
+                        return (s === 50 ? (product.originalPrice50 ?? product.price50 * 4) : (product.originalPrice100 ?? product.price100 * 4));
+                      }
+                      return (s === 50 ? (product.inspiredPrice50 ?? product.price50) : (product.inspiredPrice100 ?? product.price100));
+                    })().toLocaleString("en-IN")}
                   </button>
                 ))}
               </div>

@@ -1,12 +1,14 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { products, type Category } from "@/lib/products";
+import { products, type Category, type Product } from "@/lib/products";
+import { ProductModal } from "./ProductModal";
 
 const FILTERS: ("All" | Category)[] = ["All", "Arabic", "Designer", "Fresh", "Woody", "Limited"];
 
 export function BestSellers() {
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("All");
   const [sizes, setSizes] = useState<Record<string, 50 | 100>>({});
+  const [active, setActive] = useState<Product | null>(null);
 
   const visible = useMemo(
     () => (filter === "All" ? products : products.filter((p) => p.category === filter)),
@@ -50,7 +52,8 @@ export function BestSellers() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.4 }}
-                  className="group relative overflow-hidden rounded-sm border border-[#2a2a2a] bg-[#111111] transition-all duration-500 hover:-translate-y-2 hover:border-[#c9a84c]/40"
+                  onClick={() => setActive(p)}
+                  className="group relative cursor-pointer overflow-hidden rounded-sm border border-[#2a2a2a] bg-[#111111] transition-all duration-500 hover:-translate-y-2 hover:border-[#c9a84c]/40"
                 >
                   <div className="relative aspect-[3/4] overflow-hidden bg-[#0a0a0a]">
                     <img src={p.image} alt={p.name} loading="lazy" className="h-full w-full object-contain p-8 transition-transform duration-700 group-hover:scale-105" />
@@ -71,7 +74,7 @@ export function BestSellers() {
                         {([50, 100] as const).map((s) => (
                           <button
                             key={s}
-                            onClick={() => setSizes((m) => ({ ...m, [p.id]: s }))}
+                            onClick={(e) => { e.stopPropagation(); setSizes((m) => ({ ...m, [p.id]: s })); }}
                             className={`font-accent rounded-sm border px-2.5 py-1 text-[10px] transition-colors ${
                               size === s
                                 ? "border-[#c9a84c] text-[#c9a84c]"
@@ -88,8 +91,18 @@ export function BestSellers() {
                     </div>
                     <p className="font-display text-2xl text-[#c9a84c]">₹{price.toLocaleString("en-IN")}</p>
                     <div className="flex gap-2 pt-1">
-                      <button className="btn-ghost-gold flex-1 !py-2.5 !text-[10px]">Add to Cart</button>
-                      <a href="#order" className="btn-gold flex-1 !py-2.5 !text-[10px]">Order Now</a>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setActive(p); }}
+                        className="btn-ghost-gold flex-1 !py-2.5 !text-[10px]"
+                      >
+                        View Details
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setActive(p); }}
+                        className="btn-gold flex-1 !py-2.5 !text-[10px]"
+                      >
+                        Order Now
+                      </button>
                     </div>
                   </div>
                 </motion.article>
@@ -98,6 +111,7 @@ export function BestSellers() {
           </AnimatePresence>
         </motion.div>
       </div>
+      <ProductModal product={active} onClose={() => setActive(null)} />
     </section>
   );
 }
