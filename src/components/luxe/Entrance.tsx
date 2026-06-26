@@ -156,7 +156,6 @@ export function Entrance() {
           height: "100vh",
           objectFit: "cover",
           objectPosition: "left center",
-          transform: "scaleX(-1)",
           zIndex: 2,
           willChange: "transform",
         }}
