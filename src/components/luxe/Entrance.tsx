@@ -52,8 +52,8 @@ export function Entrance() {
 
         tl.to(".eo-title", { opacity: 1, duration: 0.5, ease: "power2.out" }, 0.3);
 
-        tl.to(".eo-door-left", { rotateY: -doorAngle, duration: 1.3, ease: "power3.inOut" }, 0.5);
-        tl.to(".eo-door-right", { rotateY: doorAngle, duration: 1.3, ease: "power3.inOut" }, 0.5);
+        tl.to(".eo-door-left", { x: slideDistance, duration: 1.3, ease: "power3.inOut" }, 0.5);
+        tl.to(".eo-door-right", { x: slideDistance.replace("-", ""), duration: 1.3, ease: "power3.inOut" }, 0.5);
         tl.to(".eo-burst", { scale: 1.2, opacity: 1, duration: 1.3, ease: "power2.out" }, 0.5);
 
         // After doors finish opening, fade overlay out so hero shows through
