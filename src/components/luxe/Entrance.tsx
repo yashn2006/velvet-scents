@@ -146,14 +146,12 @@ export function Entrance() {
         }}
       />
 
-      {/* Doors layer */}
+      {/* Split black panels */}
       <div
         className="eo-doors-layer"
-        style={{ position: "absolute", inset: 0, zIndex: 4, transformStyle: "preserve-3d" }}
+        style={{ position: "absolute", inset: 0, zIndex: 4 }}
       >
-        <img
-          src={doorLeftAsset.url}
-          alt=""
+        <div
           className="eo-door-left"
           style={{
             position: "absolute",
@@ -161,17 +159,11 @@ export function Entrance() {
             left: 0,
             width: "50vw",
             height: "100vh",
-            objectFit: "cover",
-            objectPosition: "right center",
-            transformOrigin: "left center",
-            transformStyle: "preserve-3d",
+            background: "#000",
             willChange: "transform",
-            backfaceVisibility: "hidden",
           }}
         />
-        <img
-          src={doorRightAsset.url}
-          alt=""
+        <div
           className="eo-door-right"
           style={{
             position: "absolute",
@@ -179,12 +171,8 @@ export function Entrance() {
             right: 0,
             width: "50vw",
             height: "100vh",
-            objectFit: "cover",
-            objectPosition: "left center",
-            transformOrigin: "right center",
-            transformStyle: "preserve-3d",
+            background: "#000",
             willChange: "transform",
-            backfaceVisibility: "hidden",
           }}
         />
       </div>
