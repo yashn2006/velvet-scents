@@ -27,7 +27,6 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-[#f5f0e8]">
-      <Entrance />
       <CustomCursor />
       <AmbientParticles />
       <SectionReveal />
