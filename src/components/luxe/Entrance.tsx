@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import doorLeftAsset from "@/assets/entrance/door-left.png.asset.json";
-import doorRightAsset from "@/assets/entrance/door-right.png.asset.json";
 
 const SESSION_KEY = "entrancePlayed";
 
