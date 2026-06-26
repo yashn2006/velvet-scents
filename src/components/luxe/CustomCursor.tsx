@@ -15,6 +15,8 @@ export function CustomCursor() {
     let cy = my;
     let expanded = false;
     let raf = 0;
+    let clickScale = 1;
+    let clickAnim = 0;
 
     const onMove = (e: MouseEvent) => {
       mx = e.clientX;
@@ -34,23 +36,37 @@ export function CustomCursor() {
         dot.classList.toggle("is-expanded", expanded);
       }
     };
+    const onDown = () => {
+      clickScale = 0.7;
+      cancelAnimationFrame(clickAnim);
+      const start = performance.now();
+      const ease = () => {
+        const t = Math.min(1, (performance.now() - start) / 220);
+        clickScale = 0.7 + (1 - 0.7) * t;
+        if (t < 1) clickAnim = requestAnimationFrame(ease);
+      };
+      clickAnim = requestAnimationFrame(ease);
+    };
 
     const tick = () => {
       cx += (mx - cx) * 0.18;
       cy += (my - cy) * 0.18;
-      dot.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%)`;
+      dot.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%) scale(${clickScale})`;
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
 
     window.addEventListener("mousemove", onMove, { passive: true });
     window.addEventListener("mouseover", onOver, { passive: true });
+    window.addEventListener("mousedown", onDown, { passive: true });
     document.addEventListener("mouseleave", onLeave);
 
     return () => {
       cancelAnimationFrame(raf);
+      cancelAnimationFrame(clickAnim);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseover", onOver);
+      window.removeEventListener("mousedown", onDown);
       document.removeEventListener("mouseleave", onLeave);
       dot.remove();
     };
