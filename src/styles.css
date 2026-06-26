@@ -343,8 +343,8 @@ html { scroll-behavior: smooth; }
 .mo-cursor {
   position: fixed;
   top: 0; left: 0;
-  width: 10px; height: 10px;
-  border: 1.5px solid #C9A84C;
+  width: 6px; height: 6px;
+  border: 2px solid #C9A84C;
   border-radius: 50%;
   background: transparent;
   pointer-events: none;
@@ -355,7 +355,7 @@ html { scroll-behavior: smooth; }
   will-change: transform, width, height;
 }
 .mo-cursor.is-expanded {
-  width: 36px; height: 36px;
+  width: 18px; height: 18px;
   background: rgba(201, 168, 76, 0.15);
   border-color: #C9A84C;
 }
