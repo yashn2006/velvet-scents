@@ -11,6 +11,7 @@ import { Footer } from "@/components/luxe/Footer";
 import { FloatingButtons } from "@/components/luxe/FloatingButtons";
 import { CustomCursor } from "@/components/luxe/CustomCursor";
 import { SectionReveal } from "@/components/luxe/SectionReveal";
+import { AmbientParticles } from "@/components/luxe/AmbientParticles";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -29,6 +30,7 @@ function Index() {
     <main className="min-h-screen bg-[#0a0a0a] text-[#f5f0e8]">
       <Entrance />
       <CustomCursor />
+      <AmbientParticles />
       <SectionReveal />
       <Nav />
       <Hero />
