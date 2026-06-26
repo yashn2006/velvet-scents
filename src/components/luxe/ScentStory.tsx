@@ -72,7 +72,7 @@ export function ScentStory() {
   }, []);
 
   return (
-    <section ref={ref} className="relative" style={{ height: "300vh" }}>
+    <section ref={ref} data-reveal="off" className="relative" style={{ height: "300vh" }}>
       <div className="pin-target relative grid h-screen w-full place-items-center overflow-hidden bg-[#0a0a0a]">
         <img src={bottle} alt="" className="story-bottle pointer-events-none absolute h-[70vh] w-auto opacity-90" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.6))]" />

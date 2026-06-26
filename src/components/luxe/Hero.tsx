@@ -302,22 +302,27 @@ export function Hero() {
       </div>
 
       {/* Active bottle name above spotlight */}
-      <div className="pointer-events-none absolute inset-x-0 z-20 flex justify-center" style={{ bottom: "calc(140px + 340px + 8px)" }}>
+      <div className="pointer-events-none absolute inset-x-0 z-20 flex justify-center" style={{ bottom: "calc(120px + var(--bottle-h, 260px) + 28px)" }}>
         <span
-          className="font-display text-2xl text-[#c9a84c] transition-opacity duration-500 md:text-3xl"
-          style={{ opacity: activeName ? 1 : 0, letterSpacing: "0.02em" }}
+          className="font-display text-2xl text-[#c9a84c] transition-opacity duration-500 md:text-[34px]"
+          style={{
+            opacity: activeName ? 1 : 0,
+            letterSpacing: "0.06em",
+            textShadow:
+              "0 0 18px rgba(201,168,76,0.65), 0 0 38px rgba(201,168,76,0.35), 0 2px 12px rgba(0,0,0,0.85)",
+          }}
         >
           {activeName ?? "\u00a0"}
         </span>
       </div>
 
-      <div className="relative z-10 mb-[28vh] flex flex-col items-center px-6 text-center md:mb-[32vh]">
+      <div className="absolute inset-x-0 top-[14vh] z-10 flex flex-col items-center px-6 text-center md:top-[12vh]">
         <span className="font-accent text-xs text-[#c9a84c]">Est. 2025 · Bombay</span>
-        <h1 ref={titleRef} className="font-display mt-4 text-[15vw] leading-[0.95] text-[#f5f0e8] md:text-[96px]" style={{ letterSpacing: "-0.02em" }}>
+        <h1 ref={titleRef} className="font-display mt-3 text-[12vw] leading-[0.95] text-[#f5f0e8] md:text-[80px]" style={{ letterSpacing: "-0.02em" }}>
           {SHOP.name}
         </h1>
-        <p ref={taglineRef} className="mt-4 max-w-md text-sm text-[#9a9285] md:text-base">{SHOP.tagline}</p>
-        <div ref={ctaRef} className="mt-8">
+        <p ref={taglineRef} className="mt-3 max-w-md text-sm text-[#9a9285] md:text-base">{SHOP.tagline}</p>
+        <div ref={ctaRef} className="mt-6">
           <a href="#collections" className="btn-ghost-gold cta-pulse">Explore Collection</a>
         </div>
       </div>

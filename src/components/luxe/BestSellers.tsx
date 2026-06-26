@@ -173,7 +173,6 @@ function ProductCard({ product, onOpen }: { product: StockItem; onOpen: () => vo
         background: "rgba(255,255,255,0.02)",
         border: "1px solid rgba(201,168,76,0.15)",
         borderRadius: 16,
-        backdropFilter: "blur(8px)",
         padding: 24,
         cursor: outOfStock ? "not-allowed" : undefined,
       }}
