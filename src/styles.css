@@ -355,7 +355,7 @@ html { scroll-behavior: smooth; }
   will-change: transform, width, height;
 }
 .mo-cursor.is-expanded {
-  width: 36px; height: 36px;
+  width: 18px; height: 18px;
   background: rgba(201, 168, 76, 0.15);
   border-color: #C9A84C;
 }
