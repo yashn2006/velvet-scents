@@ -66,7 +66,10 @@ export function Reviews() {
   );
 
   return (
-    <section className="bg-[#0a0a0a] py-24">
+    <section
+      className="py-24"
+      style={{ background: "linear-gradient(180deg, #0A0A0A 0%, #0A0500 100%)" }}
+    >
       <div className="mx-auto max-w-7xl px-6 text-center">
         <span className="font-accent text-xs text-[#c9a84c]">Social Proof</span>
         <h2 className="font-display mt-3 text-4xl text-[#f5f0e8] md:text-5xl">Loved Across Mumbai</h2>
