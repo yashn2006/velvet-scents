@@ -1,221 +1,279 @@
 import { useEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
+import curtainAsset from "@/assets/entrance/curtain.png.asset.json";
 import doorLeftAsset from "@/assets/entrance/door-left.png.asset.json";
 import doorRightAsset from "@/assets/entrance/door-right.png.asset.json";
-import curtainAsset from "@/assets/entrance/curtain.png.asset.json";
 
-const SESSION_KEY = "mo-entrance-played";
+const SESSION_KEY = "entrancePlayed";
+
+function preload(urls: string[]) {
+  return Promise.all(
+    urls.map(
+      (u) =>
+        new Promise<void>((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve();
+          img.onerror = () => resolve();
+          img.src = u;
+        }),
+    ),
+  );
+}
 
 export function Entrance() {
-  const [mounted, setMounted] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const [showSkip, setShowSkip] = useState(false);
-  const [canSkip, setCanSkip] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return sessionStorage.getItem(SESSION_KEY) !== "true";
+  });
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const [showSkip, setShowSkip] = useState(false);
+  const skippableRef = useRef(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (sessionStorage.getItem(SESSION_KEY)) return;
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    let cancelled = false;
+    if (!active) return;
     document.body.style.overflow = "hidden";
 
-    (async () => {
-      const { gsap } = await import("gsap");
-      if (cancelled || !rootRef.current) return;
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    const doorAngle = isMobile ? 100 : 108;
 
-      const root = rootRef.current;
-      const q = gsap.utils.selector(root);
+    const ctx = gsap.context(() => {
+      const root = rootRef.current!;
+      gsap.set(root, { perspective: isMobile ? 800 : 1400 });
+      gsap.set(".eo-title", { opacity: 0 });
+      gsap.set(".eo-burst", { scale: 0, opacity: 0 });
+      gsap.set(".eo-curtain-left, .eo-curtain-right", { xPercent: 0, scaleX: (i, el) => (el as HTMLElement).classList.contains("eo-curtain-right") ? -1 : 1 });
 
-      const tl = gsap.timeline({
-        onComplete: () => {
-          sessionStorage.setItem(SESSION_KEY, "1");
-          document.body.style.overflow = "";
-          setHidden(true);
-        },
+      preload([curtainAsset.url, doorLeftAsset.url, doorRightAsset.url]).then(() => {
+        const tl = gsap.timeline({
+          onComplete: () => finish(),
+        });
+        tlRef.current = tl;
+
+        tl.to(".eo-title", { opacity: 1, duration: 0.5, ease: "power2.out" }, 0.3);
+
+        tl.to(".eo-door-left", { rotateY: -doorAngle, duration: 1.5, ease: "power3.inOut" }, 0.6);
+        tl.to(".eo-door-right", { rotateY: doorAngle, duration: 1.5, ease: "power3.inOut" }, 0.6);
+        tl.to(".eo-burst", { scale: 1.2, opacity: 1, duration: 1.5, ease: "power2.out" }, 0.6);
+
+        tl.to(".eo-curtain-left", { xPercent: -100, duration: 1.2, ease: "power2.inOut" }, 2.1);
+        tl.to(".eo-curtain-right", { xPercent: 100, duration: 1.2, ease: "power2.inOut" }, 2.1);
+        tl.to(".eo-curtain-left", { scaleX: 1.07, duration: 0.15, yoyo: true, repeat: 1 }, 3.15);
+        tl.to(".eo-curtain-right", { scaleX: -1.07, duration: 0.15, yoyo: true, repeat: 1 }, 3.15);
+
+        // Fade out overlay backdrop near end so hero shows through; final removal in onComplete
+        tl.to(".eo-doors-layer", { opacity: 0, duration: 0.5 }, 2.6);
+        tl.to(".eo-backdrop", { opacity: 0, duration: 0.6 }, 3.3);
+        tl.to({}, { duration: 0.6 }, 3.9); // pad to ~4.5s
+
+        // Enable skip after 1.5s
+        gsap.delayedCall(1.5, () => {
+          skippableRef.current = true;
+          setShowSkip(true);
+        });
       });
-      tlRef.current = tl;
+    }, rootRef);
 
-      // 0.3s: title fade in
-      tl.to(q(".mo-ent-title"), { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 0.3);
+    const finish = () => {
+      sessionStorage.setItem(SESSION_KEY, "true");
+      document.body.style.overflow = "auto";
+      setActive(false);
+    };
 
-      // 0.6s: doors open + light burst
-      tl.to(
-        q(".mo-ent-door-left"),
-        { rotateY: -105, duration: 1.4, ease: "power3.inOut" },
-        0.6,
-      );
-      tl.to(
-        q(".mo-ent-door-right"),
-        { rotateY: 105, duration: 1.4, ease: "power3.inOut" },
-        0.6,
-      );
-      tl.to(
-        q(".mo-ent-burst"),
-        { scale: 1, opacity: 1, duration: 1.4, ease: "power2.out" },
-        0.6,
-      );
-      tl.to(q(".mo-ent-title"), { opacity: 0, duration: 0.5 }, 1.4);
+    const skip = () => {
+      if (!skippableRef.current) return;
+      tlRef.current?.kill();
+      finish();
+    };
 
-      // 2.0s: curtains sweep
-      tl.to(
-        q(".mo-ent-curtain-left"),
-        { xPercent: -100, duration: 1.1, ease: "power2.inOut" },
-        2.0,
-      );
-      tl.to(
-        q(".mo-ent-curtain-right"),
-        { xPercent: 100, duration: 1.1, ease: "power2.inOut" },
-        2.0,
-      );
-      tl.to(
-        q(".mo-ent-curtain-left, .mo-ent-curtain-right"),
-        { scaleX: 1.06, duration: 0.15, ease: "power1.out", yoyo: true, repeat: 1 },
-        2.95,
-      );
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") skip();
+    };
+    const onClick = () => skip();
 
-      // 2.8s: fade out whole overlay (hero reveals beneath)
-      tl.to(root, { opacity: 0, duration: 0.6, ease: "power2.out" }, 2.8);
-      tl.to(q(".mo-ent-burst"), { opacity: 0, duration: 0.6 }, 2.8);
-
-      // 4.2s end
-      tl.to({}, { duration: 0.6 }, 3.6);
-    })();
-
-    const skipTimer = window.setTimeout(() => {
-      setShowSkip(true);
-      setCanSkip(true);
-    }, 1500);
+    window.addEventListener("keydown", onKey);
+    rootRef.current?.addEventListener("click", onClick);
 
     return () => {
-      cancelled = true;
-      window.clearTimeout(skipTimer);
-      tlRef.current?.kill();
-      document.body.style.overflow = "";
+      ctx.revert();
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "auto";
     };
-  }, [mounted]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const skip = () => {
-    if (!canSkip) return;
-    tlRef.current?.progress(1);
-  };
-
-  if (!mounted || hidden) return null;
+  if (!active) return null;
 
   return (
     <div
       ref={rootRef}
-      onClick={skip}
-      className="fixed inset-0 z-[9999] bg-black overflow-hidden"
-      style={{ perspective: "1400px" }}
+      className="entrance-overlay"
+      style={{
+        position: "fixed",
+        inset: 0,
+        width: "100vw",
+        height: "100vh",
+        zIndex: 9999,
+        overflow: "hidden",
+      }}
     >
-      {/* Title above seam */}
+      {/* Black backdrop */}
       <div
-        className="mo-ent-title pointer-events-none absolute left-1/2 top-[18%] -translate-x-1/2 text-center"
-        style={{ opacity: 0, transform: "translate(-50%, 12px)" }}
-      >
-        <div
-          className="text-[#C9A84C] tracking-[0.5em] text-3xl md:text-5xl"
-          style={{ fontFamily: "'Cinzel', serif", textShadow: "0 0 30px rgba(201,168,76,0.5)" }}
-        >
-          MAISON OUDH
-        </div>
-      </div>
-
-      {/* Golden light burst from center seam */}
-      <div
-        className="mo-ent-burst pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        className="eo-backdrop"
         style={{
-          width: "140vmax",
-          height: "140vmax",
-          background:
-            "radial-gradient(circle, rgba(201,168,76,0.45) 0%, rgba(201,168,76,0.15) 30%, transparent 65%)",
-          opacity: 0,
-          transform: "translate(-50%, -50%) scale(0)",
-          zIndex: 1,
+          position: "absolute",
+          inset: 0,
+          background: "#000",
         }}
       />
 
-      {/* Doors */}
-      <div
-        className="mo-ent-door-left absolute top-0 left-0 h-screen"
+      {/* Curtains (behind doors) */}
+      <img
+        src={curtainAsset.url}
+        alt=""
+        className="eo-curtain-left"
         style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
           width: "50vw",
-          transformOrigin: "left center",
-          transformStyle: "preserve-3d",
-          backfaceVisibility: "hidden",
-          zIndex: 3,
+          height: "100vh",
+          objectFit: "cover",
+          objectPosition: "right center",
+          zIndex: 2,
+          willChange: "transform",
         }}
+      />
+      <img
+        src={curtainAsset.url}
+        alt=""
+        className="eo-curtain-right"
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          width: "50vw",
+          height: "100vh",
+          objectFit: "cover",
+          objectPosition: "left center",
+          zIndex: 2,
+          willChange: "transform",
+        }}
+      />
+
+      {/* Golden light burst (between curtains and doors) */}
+      <div
+        className="eo-burst"
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          width: 700,
+          height: 700,
+          marginLeft: -350,
+          marginTop: -350,
+          background:
+            "radial-gradient(circle, rgba(201,168,76,0.5) 0%, rgba(139,94,60,0.2) 40%, transparent 70%)",
+          zIndex: 3,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Doors layer */}
+      <div
+        className="eo-doors-layer"
+        style={{ position: "absolute", inset: 0, zIndex: 4, transformStyle: "preserve-3d" }}
       >
         <img
           src={doorLeftAsset.url}
           alt=""
-          className="block w-full h-full object-cover"
-          style={{ objectPosition: "right center" }}
-          draggable={false}
+          className="eo-door-left"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "50vw",
+            height: "100vh",
+            objectFit: "cover",
+            objectPosition: "right center",
+            transformOrigin: "left center",
+            transformStyle: "preserve-3d",
+            willChange: "transform",
+            backfaceVisibility: "hidden",
+          }}
         />
-      </div>
-      <div
-        className="mo-ent-door-right absolute top-0 right-0 h-screen"
-        style={{
-          width: "50vw",
-          transformOrigin: "right center",
-          transformStyle: "preserve-3d",
-          backfaceVisibility: "hidden",
-          zIndex: 3,
-        }}
-      >
         <img
           src={doorRightAsset.url}
           alt=""
-          className="block w-full h-full object-cover"
-          style={{ objectPosition: "left center" }}
-          draggable={false}
+          className="eo-door-right"
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            width: "50vw",
+            height: "100vh",
+            objectFit: "cover",
+            objectPosition: "left center",
+            transformOrigin: "right center",
+            transformStyle: "preserve-3d",
+            willChange: "transform",
+            backfaceVisibility: "hidden",
+          }}
         />
       </div>
 
-      {/* Curtains (behind doors so they're revealed when doors swing open) */}
+      {/* Title */}
       <div
-        className="mo-ent-curtain-left absolute top-0 left-0 h-screen pointer-events-none"
-        style={{ width: "50vw", zIndex: 2 }}
+        className="eo-title"
+        style={{
+          position: "absolute",
+          top: 32,
+          left: "50%",
+          transform: "translateX(-50%)",
+          color: "#C9A84C",
+          fontFamily: "Cinzel, serif",
+          fontSize: 13,
+          letterSpacing: "0.4em",
+          zIndex: 5,
+          pointerEvents: "none",
+        }}
       >
-        <img
-          src={curtainAsset.url}
-          alt=""
-          className="block w-full h-full object-cover"
-          draggable={false}
-        />
-      </div>
-      <div
-        className="mo-ent-curtain-right absolute top-0 right-0 h-screen pointer-events-none"
-        style={{ width: "50vw", zIndex: 2 }}
-      >
-        <img
-          src={curtainAsset.url}
-          alt=""
-          className="block w-full h-full object-cover"
-          style={{ transform: "scaleX(-1)" }}
-          draggable={false}
-        />
+        MAISON OUDH
       </div>
 
-      {/* Skip button */}
+      {/* Skip */}
       {showSkip && (
         <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
-            skip();
+            tlRef.current?.kill();
+            sessionStorage.setItem(SESSION_KEY, "true");
+            document.body.style.overflow = "auto";
+            setActive(false);
           }}
-          className="absolute bottom-6 right-6 z-[10] text-xs tracking-[0.3em] text-[#C9A84C]/80 hover:text-[#C9A84C] border border-[#C9A84C]/40 hover:border-[#C9A84C] px-4 py-2 rounded-full backdrop-blur-sm bg-black/40 transition-colors"
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
+          style={{
+            position: "fixed",
+            bottom: 32,
+            right: 32,
+            color: "#C9A84C",
+            fontFamily: "Cinzel, serif",
+            fontSize: 11,
+            letterSpacing: "0.3em",
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            zIndex: 10000,
+            animation: "eoFadeIn 0.3s ease forwards",
+          }}
         >
           SKIP →
         </button>
       )}
+
+      <style>{`
+        @keyframes eoFadeIn { from { opacity: 0 } to { opacity: 1 } }
+      `}</style>
     </div>
   );
 }
