@@ -21,7 +21,7 @@ export function Nav() {
         <a href="#" className="font-display text-xl text-[#f5f0e8] md:text-2xl">{SHOP.name}</a>
         <nav className="hidden gap-8 md:flex">
           {[["Collections","#collections"],["Shop","#shop"],["Order","#order"]].map(([l,h]) => (
-            <a key={l} href={h} className="font-accent text-[11px] text-[#9a9285] transition-colors hover:text-[#c9a84c]">{l}</a>
+            <a key={l} href={h} className="mo-nav-link font-accent text-[11px] text-[#9a9285]">{l}</a>
           ))}
         </nav>
         <a href="#order" className="font-accent rounded-sm border border-[#c9a84c] px-4 py-2 text-[10px] text-[#c9a84c] transition-colors hover:bg-[#c9a84c] hover:text-[#0a0a0a]">Order Now</a>
