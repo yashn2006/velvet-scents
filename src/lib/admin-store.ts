@@ -58,7 +58,9 @@ export interface StockItem extends Product {
 
 /* -------- Auth (mock JWT) -------- */
 export function login(user: string, pass: string) {
-  if (user !== ADMIN_CREDS.user || pass !== ADMIN_CREDS.pass) return false;
+  const u = (user ?? "").trim().toLowerCase();
+  const p = (pass ?? "").trim();
+  if (u !== ADMIN_CREDS.user || p !== ADMIN_CREDS.pass) return false;
   const payload = btoa(JSON.stringify({ sub: user, exp: Date.now() + 1000 * 60 * 60 * 8 }));
   const token = `mh.${payload}.sig`;
   localStorage.setItem(AUTH_KEY, token);
