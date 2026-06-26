@@ -27,33 +27,33 @@ export function Entrance() {
     const ctx = gsap.context(() => {
       gsap.set(".eo-title", { opacity: 0 });
       gsap.set(".eo-burst", { scale: 0, opacity: 0 });
-        const tl = gsap.timeline({
-          onComplete: () => finish(),
-        });
-        tlRef.current = tl;
 
-        tl.to(".eo-title", { opacity: 1, duration: 0.5, ease: "power2.out" }, 0.3);
-
-        tl.to(".eo-door-left", { x: slideDistance, duration: 1.3, ease: "power3.inOut" }, 0.5);
-        tl.to(".eo-door-right", { x: slideDistance.replace("-", ""), duration: 1.3, ease: "power3.inOut" }, 0.5);
-        tl.to(".eo-burst", { scale: 1.2, opacity: 1, duration: 1.3, ease: "power2.out" }, 0.5);
-
-        // After doors finish opening, fade overlay out so hero shows through
-        tl.to([".eo-doors-layer", ".eo-burst", ".eo-title"], { opacity: 0, duration: 0.45 }, 1.7);
-        tl.to(".eo-backdrop", { opacity: 0, duration: 0.5 }, 1.9);
-
-        // Enable skip after 1.5s
-        gsap.delayedCall(1.0, () => {
-          skippableRef.current = true;
-          setShowSkip(true);
-        });
+      const tl = gsap.timeline({
+        onComplete: () => finish(),
       });
+      tlRef.current = tl;
 
-      // Hard safety: never let the overlay block the page for more than 4s.
-      safetyTimer = window.setTimeout(() => {
-        finish();
-      }, 4000);
+      tl.to(".eo-title", { opacity: 1, duration: 0.5, ease: "power2.out" }, 0.3);
+
+      tl.to(".eo-door-left", { x: slideDistance, duration: 1.3, ease: "power3.inOut" }, 0.5);
+      tl.to(".eo-door-right", { x: slideDistance.replace("-", ""), duration: 1.3, ease: "power3.inOut" }, 0.5);
+      tl.to(".eo-burst", { scale: 1.2, opacity: 1, duration: 1.3, ease: "power2.out" }, 0.5);
+
+      // After panels finish opening, fade overlay out so hero shows through
+      tl.to([".eo-doors-layer", ".eo-burst", ".eo-title"], { opacity: 0, duration: 0.45 }, 1.7);
+      tl.to(".eo-backdrop", { opacity: 0, duration: 0.5 }, 1.9);
+
+      // Enable skip after 1s
+      gsap.delayedCall(1.0, () => {
+        skippableRef.current = true;
+        setShowSkip(true);
+      });
     }, rootRef);
+
+    // Hard safety: never let the overlay block the page for more than 4s.
+    safetyTimer = window.setTimeout(() => {
+      finish();
+    }, 4000);
 
     const finish = () => {
       if (safetyTimer) window.clearTimeout(safetyTimer);
@@ -110,7 +110,7 @@ export function Entrance() {
         }}
       />
 
-      {/* Golden light burst (between curtains and doors) */}
+      {/* Golden light burst */}
       <div
         className="eo-burst"
         style={{
