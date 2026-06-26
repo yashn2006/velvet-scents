@@ -143,7 +143,7 @@ export function Hero() {
   return (
     <section
       id="hero"
-      className="relative isolate flex min-h-screen items-center justify-center overflow-hidden"
+      className="hero-section relative isolate flex min-h-screen items-center justify-center overflow-hidden"
       style={{
         background:
           "radial-gradient(ellipse at center, #1A0A00 0%, #0A0A0A 60%, #000000 100%)",
