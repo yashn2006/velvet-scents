@@ -44,7 +44,7 @@ export function Entrance() {
       gsap.set(".eo-title", { opacity: 0 });
       gsap.set(".eo-burst", { scale: 0, opacity: 0 });
 
-      preload([doorLeftAsset.url, doorRightAsset.url]).then(() => {
+      Promise.resolve().then(() => {
         const tl = gsap.timeline({
           onComplete: () => finish(),
         });
