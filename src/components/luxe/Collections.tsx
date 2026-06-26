@@ -64,7 +64,7 @@ export function Collections() {
       <div className="relative mt-14">
         <div
           ref={stripRef}
-          className="flex gap-6 overflow-x-auto scroll-smooth px-6 pb-6"
+          className="flex flex-nowrap justify-center gap-6 overflow-x-auto scroll-smooth px-6 pb-6 lg:flex-wrap lg:overflow-visible"
           style={{ scrollbarWidth: "none" }}
         >
           {CARDS.map((c) => (

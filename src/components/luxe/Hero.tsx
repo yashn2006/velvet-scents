@@ -317,7 +317,14 @@ export function Hero() {
       </div>
 
       <div className="absolute inset-x-0 top-[14vh] z-10 flex flex-col items-center px-6 text-center md:top-[12vh]">
-        <span className="font-accent text-xs text-[#c9a84c]">Est. 2025 · Bombay</span>
+        <a
+          href="https://coreegin.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-accent text-xs text-[#c9a84c] tracking-[0.25em] transition-colors hover:text-[#f5d98a]"
+        >
+          MADE BY COREEGIN · COREEGIN.COM
+        </a>
         <h1 ref={titleRef} className="font-display mt-3 text-[12vw] leading-[0.95] text-[#f5f0e8] md:text-[80px]" style={{ letterSpacing: "-0.02em" }}>
           {SHOP.name}
         </h1>

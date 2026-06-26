@@ -32,7 +32,27 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-[#1a1a1a] py-5 text-center text-xs">
-        © {new Date().getFullYear()} {SHOP.name}. All rights reserved.
+        <div>© {new Date().getFullYear()} {SHOP.name}. All rights reserved.</div>
+        <div className="mt-2 font-accent tracking-[0.3em] text-[#9a9285]">
+          CRAFTED BY{" "}
+          <a
+            href="https://coreegin.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#c9a84c] transition-colors hover:text-[#f5d98a]"
+          >
+            COREEGIN
+          </a>{" "}
+          ·{" "}
+          <a
+            href="https://coreegin.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#c9a84c] transition-colors hover:text-[#f5d98a]"
+          >
+            coreegin.com
+          </a>
+        </div>
       </div>
       <div className="bg-gradient-to-r from-[#8b6f1f] via-[#c9a84c] to-[#8b6f1f] py-2.5 text-center">
         <span className="font-accent text-[11px] text-[#0a0a0a]">Free Delivery Across Mumbai on Orders Above ₹999</span>
