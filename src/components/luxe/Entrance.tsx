@@ -25,12 +25,8 @@ export function Entrance() {
     let safetyTimer: number | undefined;
 
     const ctx = gsap.context(() => {
-      const root = rootRef.current!;
-      gsap.set(root, {});
       gsap.set(".eo-title", { opacity: 0 });
       gsap.set(".eo-burst", { scale: 0, opacity: 0 });
-
-      Promise.resolve().then(() => {
         const tl = gsap.timeline({
           onComplete: () => finish(),
         });
