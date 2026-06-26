@@ -1,23 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import doorLeftAsset from "@/assets/entrance/door-left.png.asset.json";
-import doorRightAsset from "@/assets/entrance/door-right.png.asset.json";
 
 const SESSION_KEY = "entrancePlayed";
-
-function preload(urls: string[]) {
-  return Promise.all(
-    urls.map(
-      (u) =>
-        new Promise<void>((resolve) => {
-          const img = new Image();
-          img.onload = () => resolve();
-          img.onerror = () => resolve();
-          img.src = u;
-        }),
-    ),
-  );
-}
 
 export function Entrance() {
   const [active, setActive] = useState<boolean>(false);
@@ -36,44 +20,40 @@ export function Entrance() {
     document.body.style.overflow = "hidden";
 
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
-    const doorAngle = isMobile ? 100 : 108;
+    const slideDistance = isMobile ? "-55vw" : "-60vw";
 
     let safetyTimer: number | undefined;
 
     const ctx = gsap.context(() => {
-      const root = rootRef.current!;
-      gsap.set(root, { perspective: isMobile ? 800 : 1400 });
       gsap.set(".eo-title", { opacity: 0 });
       gsap.set(".eo-burst", { scale: 0, opacity: 0 });
 
-      preload([doorLeftAsset.url, doorRightAsset.url]).then(() => {
-        const tl = gsap.timeline({
-          onComplete: () => finish(),
-        });
-        tlRef.current = tl;
-
-        tl.to(".eo-title", { opacity: 1, duration: 0.5, ease: "power2.out" }, 0.3);
-
-        tl.to(".eo-door-left", { rotateY: -doorAngle, duration: 1.3, ease: "power3.inOut" }, 0.5);
-        tl.to(".eo-door-right", { rotateY: doorAngle, duration: 1.3, ease: "power3.inOut" }, 0.5);
-        tl.to(".eo-burst", { scale: 1.2, opacity: 1, duration: 1.3, ease: "power2.out" }, 0.5);
-
-        // After doors finish opening, fade overlay out so hero shows through
-        tl.to([".eo-doors-layer", ".eo-burst", ".eo-title"], { opacity: 0, duration: 0.45 }, 1.7);
-        tl.to(".eo-backdrop", { opacity: 0, duration: 0.5 }, 1.9);
-
-        // Enable skip after 1.5s
-        gsap.delayedCall(1.0, () => {
-          skippableRef.current = true;
-          setShowSkip(true);
-        });
+      const tl = gsap.timeline({
+        onComplete: () => finish(),
       });
+      tlRef.current = tl;
 
-      // Hard safety: never let the overlay block the page for more than 4s.
-      safetyTimer = window.setTimeout(() => {
-        finish();
-      }, 4000);
+      tl.to(".eo-title", { opacity: 1, duration: 0.5, ease: "power2.out" }, 0.3);
+
+      tl.to(".eo-door-left", { x: slideDistance, duration: 1.3, ease: "power3.inOut" }, 0.5);
+      tl.to(".eo-door-right", { x: slideDistance.replace("-", ""), duration: 1.3, ease: "power3.inOut" }, 0.5);
+      tl.to(".eo-burst", { scale: 1.2, opacity: 1, duration: 1.3, ease: "power2.out" }, 0.5);
+
+      // After panels finish opening, fade overlay out so hero shows through
+      tl.to([".eo-doors-layer", ".eo-burst", ".eo-title"], { opacity: 0, duration: 0.45 }, 1.7);
+      tl.to(".eo-backdrop", { opacity: 0, duration: 0.5 }, 1.9);
+
+      // Enable skip after 1s
+      gsap.delayedCall(1.0, () => {
+        skippableRef.current = true;
+        setShowSkip(true);
+      });
     }, rootRef);
+
+    // Hard safety: never let the overlay block the page for more than 4s.
+    safetyTimer = window.setTimeout(() => {
+      finish();
+    }, 4000);
 
     const finish = () => {
       if (safetyTimer) window.clearTimeout(safetyTimer);
@@ -130,7 +110,7 @@ export function Entrance() {
         }}
       />
 
-      {/* Golden light burst (between curtains and doors) */}
+      {/* Golden light burst */}
       <div
         className="eo-burst"
         style={{
@@ -148,14 +128,12 @@ export function Entrance() {
         }}
       />
 
-      {/* Doors layer */}
+      {/* Split black panels */}
       <div
         className="eo-doors-layer"
-        style={{ position: "absolute", inset: 0, zIndex: 4, transformStyle: "preserve-3d" }}
+        style={{ position: "absolute", inset: 0, zIndex: 4 }}
       >
-        <img
-          src={doorLeftAsset.url}
-          alt=""
+        <div
           className="eo-door-left"
           style={{
             position: "absolute",
@@ -163,17 +141,11 @@ export function Entrance() {
             left: 0,
             width: "50vw",
             height: "100vh",
-            objectFit: "cover",
-            objectPosition: "right center",
-            transformOrigin: "left center",
-            transformStyle: "preserve-3d",
+            background: "#000",
             willChange: "transform",
-            backfaceVisibility: "hidden",
           }}
         />
-        <img
-          src={doorRightAsset.url}
-          alt=""
+        <div
           className="eo-door-right"
           style={{
             position: "absolute",
@@ -181,12 +153,8 @@ export function Entrance() {
             right: 0,
             width: "50vw",
             height: "100vh",
-            objectFit: "cover",
-            objectPosition: "left center",
-            transformOrigin: "right center",
-            transformStyle: "preserve-3d",
+            background: "#000",
             willChange: "transform",
-            backfaceVisibility: "hidden",
           }}
         />
       </div>
