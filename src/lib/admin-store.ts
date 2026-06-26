@@ -3,6 +3,33 @@ import { products as seedProducts, type Product } from "./products";
 const ORDERS_KEY = "maisonoudh_orders";
 const PRODUCTS_KEY = "maisonoudh_products";
 const AUTH_KEY = "maisonoudh_admin_token";
+const PRODUCTS_EVENT = "mo:products-changed";
+
+function emitProductsChanged() {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent(PRODUCTS_EVENT));
+}
+
+/**
+ * Subscribe to live product changes (admin edits, cross-tab updates,
+ * and a 30s polling refresh that mimics React-Query staleTime).
+ * Returns an unsubscribe function.
+ */
+export function subscribeProducts(cb: () => void, pollMs = 30000) {
+  if (typeof window === "undefined") return () => {};
+  const onEvt = () => cb();
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === PRODUCTS_KEY) cb();
+  };
+  window.addEventListener(PRODUCTS_EVENT, onEvt);
+  window.addEventListener("storage", onStorage);
+  const id = window.setInterval(cb, pollMs);
+  return () => {
+    window.removeEventListener(PRODUCTS_EVENT, onEvt);
+    window.removeEventListener("storage", onStorage);
+    window.clearInterval(id);
+  };
+}
 
 export const ADMIN_CREDS = { user: "admin", pass: "maisonoudh" };
 
@@ -86,6 +113,7 @@ export function getProducts(): StockItem[] {
 }
 export function saveProducts(list: StockItem[]) {
   localStorage.setItem(PRODUCTS_KEY, JSON.stringify(list));
+  emitProductsChanged();
 }
 export function upsertProduct(item: StockItem) {
   const list = getProducts();
