@@ -73,11 +73,11 @@ function Shell({ onLogout }: { onLogout: () => void }) {
   }, []);
 
   return (
-    <div className="admin-shell min-h-screen">
+    <div className="admin-shell admin-layout min-h-screen">
       {/* Sidebar — desktop */}
       <aside
-        className="fixed inset-y-0 left-0 hidden flex-col md:flex"
-        style={{ width: 260, background: "#0D0D0D", borderRight: "1px solid rgba(201,168,76,0.2)" }}
+        className="hidden flex-col md:flex"
+        style={{ position: "fixed", top: 0, left: 0, width: 260, height: "100vh", zIndex: 100, background: "#0D0D0D", borderRight: "1px solid rgba(201,168,76,0.2)" }}
       >
         <Link to="/admin" className="block px-6 pt-8 pb-6">
           <span style={{ fontFamily: "Cinzel, serif" }} className="text-[10px] tracking-[0.45em] text-[#c9a84c]/80">MAISON OUDH</span>
@@ -131,7 +131,10 @@ function Shell({ onLogout }: { onLogout: () => void }) {
         <button onClick={onLogout} className="ml-auto whitespace-nowrap text-[10px] tracking-[0.3em] text-[#9a9285]">EXIT</button>
       </header>
 
-      <main style={{ paddingLeft: 0 }} className="md:pl-[260px]">
+      <main
+        className="admin-main"
+        style={{ minHeight: "100vh", overflowY: "auto" }}
+      >
         {/* Desktop topbar */}
         <div className="admin-topbar hidden md:flex">
           <div>
