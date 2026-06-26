@@ -315,7 +315,7 @@ html { scroll-behavior: smooth; }
   pointer-events: none;
   z-index: 9999;
   opacity: 0;
-  mix-blend-mode: difference;
+
   transition: width 0.25s ease, height 0.25s ease, background 0.25s ease, opacity 0.2s ease, border-color 0.25s ease;
   will-change: transform, width, height;
 }
