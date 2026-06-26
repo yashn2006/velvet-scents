@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import curtainAsset from "@/assets/entrance/curtain.png.asset.json";
 import doorLeftAsset from "@/assets/entrance/door-left.png.asset.json";
 import doorRightAsset from "@/assets/entrance/door-right.png.asset.json";
 
@@ -21,14 +20,16 @@ function preload(urls: string[]) {
 }
 
 export function Entrance() {
-  const [active, setActive] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return sessionStorage.getItem(SESSION_KEY) !== "true";
-  });
+  const [active, setActive] = useState<boolean>(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const [showSkip, setShowSkip] = useState(false);
   const skippableRef = useRef(false);
+
+  // Decide on mount (client only) to avoid SSR hydration mismatch.
+  useEffect(() => {
+    if (sessionStorage.getItem(SESSION_KEY) !== "true") setActive(true);
+  }, []);
 
   useEffect(() => {
     if (!active) return;
@@ -42,9 +43,8 @@ export function Entrance() {
       gsap.set(root, { perspective: isMobile ? 800 : 1400 });
       gsap.set(".eo-title", { opacity: 0 });
       gsap.set(".eo-burst", { scale: 0, opacity: 0 });
-      gsap.set(".eo-curtain-left, .eo-curtain-right", { xPercent: 0, scaleX: (i, el) => (el as HTMLElement).classList.contains("eo-curtain-right") ? -1 : 1 });
 
-      preload([curtainAsset.url, doorLeftAsset.url, doorRightAsset.url]).then(() => {
+      preload([doorLeftAsset.url, doorRightAsset.url]).then(() => {
         const tl = gsap.timeline({
           onComplete: () => finish(),
         });
@@ -56,15 +56,9 @@ export function Entrance() {
         tl.to(".eo-door-right", { rotateY: doorAngle, duration: 1.5, ease: "power3.inOut" }, 0.6);
         tl.to(".eo-burst", { scale: 1.2, opacity: 1, duration: 1.5, ease: "power2.out" }, 0.6);
 
-        tl.to(".eo-curtain-left", { xPercent: -100, duration: 1.2, ease: "power2.inOut" }, 2.1);
-        tl.to(".eo-curtain-right", { xPercent: 100, duration: 1.2, ease: "power2.inOut" }, 2.1);
-        tl.to(".eo-curtain-left", { scaleX: 1.07, duration: 0.15, yoyo: true, repeat: 1 }, 3.15);
-        tl.to(".eo-curtain-right", { scaleX: -1.07, duration: 0.15, yoyo: true, repeat: 1 }, 3.15);
-
-        // Fade out overlay backdrop near end so hero shows through; final removal in onComplete
-        tl.to(".eo-doors-layer", { opacity: 0, duration: 0.5 }, 2.6);
-        tl.to(".eo-backdrop", { opacity: 0, duration: 0.6 }, 3.3);
-        tl.to({}, { duration: 0.6 }, 3.9); // pad to ~4.5s
+        // After doors finish opening, fade overlay out so hero shows through
+        tl.to([".eo-doors-layer", ".eo-burst", ".eo-title"], { opacity: 0, duration: 0.5 }, 2.1);
+        tl.to(".eo-backdrop", { opacity: 0, duration: 0.5 }, 2.3);
 
         // Enable skip after 1.5s
         gsap.delayedCall(1.5, () => {
@@ -124,40 +118,6 @@ export function Entrance() {
           position: "absolute",
           inset: 0,
           background: "#000",
-        }}
-      />
-
-      {/* Curtains (behind doors) */}
-      <img
-        src={curtainAsset.url}
-        alt=""
-        className="eo-curtain-left"
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "50vw",
-          height: "100vh",
-          objectFit: "cover",
-          objectPosition: "right center",
-          zIndex: 2,
-          willChange: "transform",
-        }}
-      />
-      <img
-        src={curtainAsset.url}
-        alt=""
-        className="eo-curtain-right"
-        style={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-          width: "50vw",
-          height: "100vh",
-          objectFit: "cover",
-          objectPosition: "left center",
-          zIndex: 2,
-          willChange: "transform",
         }}
       />
 
