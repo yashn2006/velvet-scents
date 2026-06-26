@@ -343,8 +343,8 @@ html { scroll-behavior: smooth; }
 .mo-cursor {
   position: fixed;
   top: 0; left: 0;
-  width: 10px; height: 10px;
-  border: 1.5px solid #C9A84C;
+  width: 6px; height: 6px;
+  border: 2px solid #C9A84C;
   border-radius: 50%;
   background: transparent;
   pointer-events: none;
