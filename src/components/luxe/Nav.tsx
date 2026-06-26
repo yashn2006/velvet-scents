@@ -4,13 +4,19 @@ import { SHOP } from "@/lib/products";
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const onS = () => setScrolled(window.scrollY > 60);
+    const onS = () => setScrolled(window.scrollY > 80);
     onS();
     window.addEventListener("scroll", onS, { passive: true });
     return () => window.removeEventListener("scroll", onS);
   }, []);
   return (
-    <header className={`fixed inset-x-0 top-0 z-40 transition-all duration-500 ${scrolled ? "bg-[#0a0a0a]/85 backdrop-blur-md border-b border-[#1a1a1a]" : ""}`}>
+    <header
+      className={`fixed inset-x-0 top-0 z-40 transition-all duration-300 ${
+        scrolled
+          ? "bg-black/85 backdrop-blur-2xl border-b border-[#c9a84c]/30"
+          : "bg-transparent border-b border-transparent"
+      }`}
+    >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <a href="#" className="font-display text-xl text-[#f5f0e8] md:text-2xl">{SHOP.name}</a>
         <nav className="hidden gap-8 md:flex">
