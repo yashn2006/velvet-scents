@@ -11,6 +11,7 @@ import { FloatingButtons } from "@/components/luxe/FloatingButtons";
 import { CustomCursor } from "@/components/luxe/CustomCursor";
 import { SectionReveal } from "@/components/luxe/SectionReveal";
 import { AmbientParticles } from "@/components/luxe/AmbientParticles";
+import { LaunchIntro } from "@/components/luxe/LaunchIntro";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,6 +28,8 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-[#f5f0e8]">
+      <style>{`.hero-section{opacity:0;transition:opacity 0.6s ease;}.hero-section.visible{opacity:1;}`}</style>
+      <LaunchIntro />
       <CustomCursor />
       <AmbientParticles />
       <SectionReveal />
