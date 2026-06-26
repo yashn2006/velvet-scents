@@ -23,7 +23,11 @@ export function CustomCursor() {
       my = e.clientY;
       dot.style.opacity = "1";
     };
-    const onLeave = () => { dot.style.opacity = "0"; };
+    // Only hide when the mouse actually leaves the window (not on click / focus shifts).
+    const onOut = (e: MouseEvent) => {
+      if (!e.relatedTarget && !(e as any).toElement) dot.style.opacity = "0";
+    };
+    const onEnter = () => { dot.style.opacity = "1"; };
 
     const isHover = (el: Element | null) =>
       !!el && !!el.closest(
@@ -59,7 +63,8 @@ export function CustomCursor() {
     window.addEventListener("mousemove", onMove, { passive: true });
     window.addEventListener("mouseover", onOver, { passive: true });
     window.addEventListener("mousedown", onDown, { passive: true });
-    document.addEventListener("mouseleave", onLeave);
+    document.addEventListener("mouseout", onOut);
+    document.addEventListener("mouseenter", onEnter);
 
     return () => {
       cancelAnimationFrame(raf);
@@ -67,7 +72,8 @@ export function CustomCursor() {
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseover", onOver);
       window.removeEventListener("mousedown", onDown);
-      document.removeEventListener("mouseleave", onLeave);
+      document.removeEventListener("mouseout", onOut);
+      document.removeEventListener("mouseenter", onEnter);
       dot.remove();
     };
   }, []);
