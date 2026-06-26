@@ -40,7 +40,7 @@ export function Entrance() {
 
     const ctx = gsap.context(() => {
       const root = rootRef.current!;
-      gsap.set(root, { perspective: isMobile ? 800 : 1400 });
+      gsap.set(root, {});
       gsap.set(".eo-title", { opacity: 0 });
       gsap.set(".eo-burst", { scale: 0, opacity: 0 });
 
