@@ -1,22 +1,22 @@
-import { useEffect, useRef, useCallback } from "react";
-import khamrahWaha from "@/assets/bottles/khamrah-waha.png";
-import acquaProfumo from "@/assets/bottles/acqua-profumo.png";
-import clubDeNuit from "@/assets/bottles/club-de-nuit.png";
-import acquaParfum from "@/assets/bottles/acqua-parfum.png";
-import oudForGlory from "@/assets/bottles/oud-for-glory.png";
-import sauvageElixir from "@/assets/bottles/sauvage-elixir.png";
+import { useEffect, useRef, useState } from "react";
+import khamrah from "@/assets/bottles/khamrah.avif.asset.json";
+import adgProfumo from "@/assets/bottles/adg-profumo.avif.asset.json";
+import cdnim from "@/assets/bottles/cdnim.avif.asset.json";
+import adgParfum from "@/assets/bottles/adg-parfum.avif.asset.json";
+import oudGlory from "@/assets/bottles/oud-glory.avif.asset.json";
+import sauvage from "@/assets/bottles/sauvage.avif.asset.json";
 import { SHOP } from "@/lib/products";
 
-const RING_BOTTLES = [
-  { src: khamrahWaha, name: "Lattafa Khamrah Waha" },
-  { src: acquaProfumo, name: "Armani Acqua di Gio Profumo" },
-  { src: clubDeNuit, name: "Armaf Club de Nuit Intense Man" },
-  { src: acquaParfum, name: "Armani Acqua di Gio Parfum" },
-  { src: oudForGlory, name: "Lattafa Oud For Glory" },
-  { src: sauvageElixir, name: "Dior Sauvage Elixir" },
+const PODIUM_BOTTLES = [
+  { src: khamrah.url, name: "Lattafa Khamrah Waha" },
+  { src: adgProfumo.url, name: "Acqua di Gio Profumo" },
+  { src: cdnim.url, name: "Club de Nuit Intense" },
+  { src: adgParfum.url, name: "Acqua di Gio Parfum" },
+  { src: oudGlory.url, name: "Lattafa Oud For Glory" },
+  { src: sauvage.url, name: "Dior Sauvage Elixir" },
 ];
-const STEP = 360 / RING_BOTTLES.length; // 60deg
-const RING_RADIUS = 380; // px — wider orbit
+// duplicate the list once for seamless infinite loop
+const TRAIN = [...PODIUM_BOTTLES, ...PODIUM_BOTTLES];
 
 export function Hero() {
   const leftCurtainRef = useRef<HTMLDivElement>(null);
@@ -25,9 +25,10 @@ export function Hero() {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const taglineRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
-  const gsapRef = useRef<typeof import("gsap")["gsap"] | null>(null);
+  const podiumRef = useRef<HTMLDivElement>(null);
+  const trainRef = useRef<HTMLDivElement>(null);
+  const spotlightZoneRef = useRef<HTMLDivElement>(null);
+  const [activeName, setActiveName] = useState<string | null>(null);
 
   useEffect(() => {
     let raf = 0;
@@ -37,7 +38,6 @@ export function Hero() {
     (async () => {
       const { gsap } = await import("gsap");
       if (cancelled) return;
-      gsapRef.current = gsap;
 
       const canvas = canvasRef.current!;
       const ctx = canvas.getContext("2d")!;
@@ -79,7 +79,7 @@ export function Hero() {
       tl.to(leftCurtainRef.current, { xPercent: -100, duration: 1.4, ease: "power3.inOut" }, 0)
         .to(rightCurtainRef.current, { xPercent: 100, duration: 1.4, ease: "power3.inOut" }, 0);
 
-      tl.from(stageRef.current, {
+      tl.from(podiumRef.current, {
         opacity: 0, y: 80, duration: 1.4, ease: "power3.out",
       }, 0.6);
 
@@ -107,149 +107,187 @@ export function Hero() {
     };
   }, []);
 
-  // Nudge: temporarily speed up the spin in a direction by adding a rotateY
-  // offset on an inner wrapper. The outer ring keeps its pure CSS infinite
-  // spin running underneath, so nothing ever pauses.
-  const nudgeRef = useRef<HTMLDivElement>(null);
-  const nudgeAccumRef = useRef(0);
-  const nudge = useCallback((dir: 1 | -1) => {
-    const gsap = gsapRef.current;
-    if (!gsap || !nudgeRef.current) return;
-    nudgeAccumRef.current += dir * 90;
-    gsap.to(nudgeRef.current, {
-      rotateY: nudgeAccumRef.current,
-      duration: 1.1,
-      ease: "power2.out",
-    });
-  }, []);
-
-  // Swipe support
+  // Spotlight detection: which bottle is in the center spotlight zone
   useEffect(() => {
-    const el = stageRef.current;
-    if (!el) return;
-    let startX = 0;
-    let active = false;
-    const onStart = (e: TouchEvent) => { startX = e.touches[0].clientX; active = true; };
-    const onEnd = (e: TouchEvent) => {
-      if (!active) return;
-      active = false;
-      const dx = e.changedTouches[0].clientX - startX;
-      if (Math.abs(dx) > 40) nudge(dx < 0 ? 1 : -1);
+    const zone = spotlightZoneRef.current;
+    const train = trainRef.current;
+    if (!zone || !train) return;
+    let raf = 0;
+    const tick = () => {
+      const zr = zone.getBoundingClientRect();
+      const zc = zr.left + zr.width / 2;
+      let bestEl: HTMLElement | null = null;
+      let bestDist = Infinity;
+      const items = train.querySelectorAll<HTMLElement>("[data-bottle]");
+      items.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        const c = r.left + r.width / 2;
+        const d = Math.abs(c - zc);
+        if (d < bestDist) { bestDist = d; bestEl = el; }
+      });
+      items.forEach((el) => {
+        const isActive = el === bestEl && bestDist < 90;
+        el.dataset.active = isActive ? "1" : "0";
+      });
+      if (bestEl && bestDist < 90) {
+        setActiveName((bestEl as HTMLElement).dataset.name ?? null);
+      } else {
+        setActiveName(null);
+      }
+      raf = requestAnimationFrame(tick);
     };
-    el.addEventListener("touchstart", onStart, { passive: true });
-    el.addEventListener("touchend", onEnd);
-    return () => {
-      el.removeEventListener("touchstart", onStart);
-      el.removeEventListener("touchend", onEnd);
-    };
-  }, [nudge]);
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   return (
     <section className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-[#0a0a0a]">
       <style>{`
-        @keyframes maison-ring-spin {
-          from { transform: rotateY(0deg); }
-          to   { transform: rotateY(360deg); }
+        @keyframes maison-train-scroll {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-50%); }
         }
-        .maison-ring-spin {
-          animation: maison-ring-spin 20s linear infinite;
-          transform-style: preserve-3d;
+        .maison-train {
+          animation: maison-train-scroll 18s linear infinite;
           will-change: transform;
+        }
+        [data-bottle] .bottle-img { transition: transform .45s ease, filter .45s ease; }
+        [data-bottle] .bottle-glow { transition: opacity .45s ease, transform .45s ease, filter .45s ease; }
+        [data-bottle][data-active="1"] .bottle-img {
+          transform: translateY(-14px) scale(1.25);
+          filter: brightness(1.3) drop-shadow(0 30px 50px rgba(201,168,76,0.45));
+        }
+        [data-bottle][data-active="1"] .bottle-glow {
+          opacity: 1;
+          transform: scaleX(1.4);
+          filter: blur(14px);
         }
       `}</style>
       <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 h-full w-full" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#0a0a0a_85%)]" />
 
-      {/* 3D rotating ring of bottles (globe / ferris-wheel spin) */}
-      <div
-        ref={stageRef}
-        className="absolute inset-x-0 bottom-[4vh] z-10 flex items-end justify-center"
-        style={{ perspective: "1000px" }}
-      >
-        <div className="relative mx-auto h-[500px] w-full max-w-[1100px] md:h-[560px]" style={{ minWidth: 320 }}>
-          {/* nudge wrapper — GSAP rotates this on click/swipe */}
+      {/* Soft ambient glow under the podium */}
+      <div className="pointer-events-none absolute bottom-0 left-1/2 h-[40vh] w-[90vw] max-w-[1100px] -translate-x-1/2 bg-[radial-gradient(ellipse_at_bottom,rgba(180,60,30,0.18),transparent_70%)]" />
+
+      {/* PODIUM STAGE */}
+      <div ref={podiumRef} className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
+        <div className="relative mx-auto w-full">
+          {/* spotlight beam from above */}
           <div
-            ref={nudgeRef}
-            className="absolute inset-0"
-            style={{ transformStyle: "preserve-3d" }}
-          >
-            {/* pure-CSS infinite spinning ring */}
-            <div ref={ringRef} className="maison-ring-spin absolute inset-0">
-              {RING_BOTTLES.map((b, i) => {
-                const angle = i * STEP;
-                return (
-                  <div
-                    key={i}
-                    className="absolute left-1/2 top-1/2 flex flex-col items-center"
+            className="pointer-events-none absolute left-1/2 -translate-x-1/2"
+            style={{
+              bottom: "180px",
+              width: "260px",
+              height: "70vh",
+              background:
+                "linear-gradient(to bottom, rgba(255,236,180,0) 0%, rgba(255,236,180,0.18) 70%, rgba(255,236,180,0.32) 100%)",
+              clipPath: "polygon(42% 0, 58% 0, 100% 100%, 0 100%)",
+              filter: "blur(10px)",
+              opacity: 0.6,
+              mixBlendMode: "screen",
+            }}
+          />
+
+          {/* bottle train */}
+          <div className="relative h-[300px] overflow-hidden md:h-[340px]">
+            {/* side vignettes */}
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-[180px] bg-gradient-to-r from-[#0a0a0a] to-transparent" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-[180px] bg-gradient-to-l from-[#0a0a0a] to-transparent" />
+
+            {/* center spotlight detection zone */}
+            <div
+              ref={spotlightZoneRef}
+              className="pointer-events-none absolute left-1/2 top-0 z-10 h-full w-[2px] -translate-x-1/2"
+            />
+
+            <div ref={trainRef} className="maison-train absolute bottom-0 left-0 flex items-end" style={{ width: "max-content" }}>
+              {TRAIN.map((b, i) => (
+                <div
+                  key={i}
+                  data-bottle
+                  data-name={b.name}
+                  data-active="0"
+                  className="relative flex flex-col items-center"
+                  style={{ paddingLeft: 60, paddingRight: 60 }}
+                >
+                  <img
+                    src={b.src}
+                    alt={b.name}
+                    draggable={false}
+                    className="bottle-img select-none"
                     style={{
-                      transform: `translate(-50%, -40%) rotateY(${angle}deg) translateZ(${RING_RADIUS}px)`,
-                      transformStyle: "preserve-3d",
+                      height: "var(--bottle-h, 260px)",
+                      width: "auto",
+                      objectFit: "contain",
+                      filter: "drop-shadow(0 20px 24px rgba(0,0,0,0.7))",
                     }}
-                  >
-                    {/* counter-rotate so bottles always face the camera */}
-                    <div
-                      className="flex flex-col items-center"
-                      style={{
-                        transform: `rotateY(${-angle}deg)`,
-                        transformStyle: "preserve-3d",
-                      }}
-                    >
-                      <img
-                        src={b.src}
-                        alt={b.name}
-                        draggable={false}
-                        className="select-none"
-                        style={{
-                          width: 220,
-                          height: 380,
-                          objectFit: "contain",
-                          filter: "drop-shadow(0 30px 40px rgba(0,0,0,0.6))",
-                        }}
-                      />
-                      <div
-                        className="-mt-2 rounded-[50%]"
-                        style={{
-                          width: 220,
-                          height: 44,
-                          background:
-                            "radial-gradient(ellipse at center, rgba(201,168,76,0.55), transparent 70%)",
-                          filter: "blur(8px)",
-                        }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
+                  />
+                  {/* reflection */}
+                  <img
+                    src={b.src}
+                    alt=""
+                    aria-hidden
+                    draggable={false}
+                    className="select-none"
+                    style={{
+                      position: "absolute",
+                      bottom: "calc(-1 * var(--bottle-h, 260px) * 0.55)",
+                      height: "calc(var(--bottle-h, 260px) * 0.55)",
+                      width: "auto",
+                      objectFit: "contain",
+                      transform: "scaleY(-1)",
+                      opacity: 0.25,
+                      filter: "blur(4px)",
+                      maskImage: "linear-gradient(to bottom, black, transparent 90%)",
+                      WebkitMaskImage: "linear-gradient(to bottom, black, transparent 90%)",
+                    }}
+                  />
+                  {/* individual pedestal glow */}
+                  <div
+                    className="bottle-glow pointer-events-none"
+                    style={{
+                      position: "absolute",
+                      bottom: -6,
+                      width: 160,
+                      height: 28,
+                      borderRadius: "50%",
+                      background:
+                        "radial-gradient(ellipse at center, rgba(201,168,76,0.7), transparent 70%)",
+                      filter: "blur(10px)",
+                      opacity: 0.55,
+                    }}
+                  />
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* arrows */}
-          <button
-            type="button"
-            aria-label="Previous bottle"
-            onClick={() => nudge(-1)}
-            className="group absolute left-2 top-1/2 z-20 -translate-y-1/2 rounded-full border border-[#c9a84c]/40 bg-black/40 p-3 text-[#c9a84c] backdrop-blur-sm transition-all hover:scale-110 hover:bg-black/70 hover:text-[#f5d97a] md:left-6 md:p-4"
+          {/* THE PODIUM SURFACE */}
+          <div
+            className="relative h-[120px] w-full"
+            style={{
+              background:
+                "linear-gradient(to bottom, #0d0d0d 0%, #060606 60%, #000 100%)",
+              boxShadow: "0 -1px 0 rgba(201,168,76,0.55), 0 -20px 60px rgba(0,0,0,0.6) inset",
+            }}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M15 6l-6 6 6 6" />
-            </svg>
-          </button>
-          <button
-            type="button"
-            aria-label="Next bottle"
-            onClick={() => nudge(1)}
-            className="group absolute right-2 top-1/2 z-20 -translate-y-1/2 rounded-full border border-[#c9a84c]/40 bg-black/40 p-3 text-[#c9a84c] backdrop-blur-sm transition-all hover:scale-110 hover:bg-black/70 hover:text-[#f5d97a] md:right-6 md:p-4"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M9 6l6 6-6 6" />
-            </svg>
-          </button>
+            {/* gold top edge highlight */}
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c9a84c] to-transparent" />
+          </div>
         </div>
       </div>
 
-      <div className="pointer-events-none absolute bottom-0 left-1/2 h-[60vh] w-[80vw] max-w-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse,rgba(201,168,76,0.18),transparent_70%)]" />
+      {/* Active bottle name above spotlight */}
+      <div className="pointer-events-none absolute inset-x-0 z-20 flex justify-center" style={{ bottom: "calc(140px + 340px + 8px)" }}>
+        <span
+          className="font-display text-2xl text-[#c9a84c] transition-opacity duration-500 md:text-3xl"
+          style={{ opacity: activeName ? 1 : 0, letterSpacing: "0.02em" }}
+        >
+          {activeName ?? "\u00a0"}
+        </span>
+      </div>
 
-      <div className="relative z-10 -mt-[10vh] flex flex-col items-center px-6 text-center">
+      <div className="relative z-10 mb-[28vh] flex flex-col items-center px-6 text-center md:mb-[32vh]">
         <span className="font-accent text-xs text-[#c9a84c]">Est. 2025 · Bombay</span>
         <h1 ref={titleRef} className="font-display mt-4 text-[15vw] leading-[0.95] text-[#f5f0e8] md:text-[96px]" style={{ letterSpacing: "-0.02em" }}>
           {SHOP.name}
