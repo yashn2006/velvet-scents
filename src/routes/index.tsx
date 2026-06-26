@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Entrance } from "@/components/luxe/Entrance";
 import { Nav } from "@/components/luxe/Nav";
 import { Hero } from "@/components/luxe/Hero";
 import { Collections } from "@/components/luxe/Collections";
