@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { products, CATEGORY_LABELS, type Category, type Mood, type Product } from "@/lib/products";
+import { CATEGORY_LABELS, type Category, type Mood, type Product } from "@/lib/products";
+import { getProducts, subscribeProducts, type StockItem } from "@/lib/admin-store";
 import { ProductModal } from "./ProductModal";
 
 const CAT_FILTERS: ("All" | Category)[] = ["All", "Arabic", "Designer", "Fresh", "Woody", "Limited"];
@@ -12,15 +13,26 @@ export function BestSellers() {
   const [mood, setMood] = useState<(typeof MOOD_FILTERS)[number]>("All");
   const [page, setPage] = useState(1);
   const [active, setActive] = useState<Product | null>(null);
+  const [liveProducts, setLiveProducts] = useState<StockItem[]>([]);
+
+  // Live sync with admin inventory: initial fetch, then subscribe to
+  // upsert/delete events, cross-tab storage events, and a 30s refresh.
+  useEffect(() => {
+    const load = () => setLiveProducts(getProducts());
+    load();
+    const unsub = subscribeProducts(load);
+    return unsub;
+  }, []);
 
   const filtered = useMemo(
     () =>
-      products.filter(
+      liveProducts.filter(
         (p) =>
+          p.active !== false &&
           (cat === "All" || p.category === cat) &&
           (mood === "All" || p.mood === mood),
       ),
-    [cat, mood],
+    [cat, mood, liveProducts],
   );
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   const safePage = Math.min(page, totalPages);
@@ -129,14 +141,15 @@ export function BestSellers() {
   );
 }
 
-function ProductCard({ product, onOpen }: { product: Product; onOpen: () => void }) {
+function ProductCard({ product, onOpen }: { product: StockItem; onOpen: () => void }) {
   const fromPrice = Math.min(
     product.inspiredPrice50 ?? product.price50,
     product.inspiredPrice100 ?? product.price100,
   );
+  const outOfStock = (product.stock ?? 0) <= 0;
   return (
     <article
-      onClick={onOpen}
+      onClick={outOfStock ? undefined : onOpen}
       className="mo-card group relative cursor-pointer overflow-hidden"
       style={{
         background: "rgba(255,255,255,0.02)",
@@ -144,10 +157,22 @@ function ProductCard({ product, onOpen }: { product: Product; onOpen: () => void
         borderRadius: 16,
         backdropFilter: "blur(8px)",
         padding: 24,
+        cursor: outOfStock ? "not-allowed" : undefined,
       }}
     >
       {/* diagonal glass shine */}
       <span aria-hidden className="mo-card-shine" />
+
+      {outOfStock && (
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-[16px] bg-black/70 backdrop-blur-[2px]">
+          <span
+            className="font-accent rounded-sm border border-[#c9a84c] bg-[#0a0a0a]/80 px-4 py-2 text-[11px] tracking-[0.35em] text-[#c9a84c]"
+            style={{ transform: "rotate(-6deg)" }}
+          >
+            OUT OF STOCK
+          </span>
+        </div>
+      )}
 
       {/* Image stage */}
       <div className="relative mx-auto flex h-[200px] items-center justify-center">
@@ -156,7 +181,7 @@ function ProductCard({ product, onOpen }: { product: Product; onOpen: () => void
           src={product.image}
           alt={product.name}
           loading="lazy"
-          className="mo-card-img relative h-full w-auto max-w-full object-contain transition-transform duration-[400ms] ease-out"
+          className={`mo-card-img relative h-full w-auto max-w-full object-contain transition-transform duration-[400ms] ease-out ${outOfStock ? "opacity-40 grayscale" : ""}`}
         />
       </div>
 
@@ -174,10 +199,11 @@ function ProductCard({ product, onOpen }: { product: Product; onOpen: () => void
         </p>
         <div className="pt-2">
           <button
-            onClick={(e) => { e.stopPropagation(); onOpen(); }}
-            className="mo-card-cta font-accent inline-flex items-center justify-center rounded-sm border border-[#c9a84c] px-5 py-2 text-[10px] tracking-[0.3em] text-[#c9a84c] transition-all hover:bg-[#c9a84c] hover:text-[#0a0a0a]"
+            disabled={outOfStock}
+            onClick={(e) => { e.stopPropagation(); if (!outOfStock) onOpen(); }}
+            className="mo-card-cta font-accent inline-flex items-center justify-center rounded-sm border border-[#c9a84c] px-5 py-2 text-[10px] tracking-[0.3em] text-[#c9a84c] transition-all hover:bg-[#c9a84c] hover:text-[#0a0a0a] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-[#c9a84c]"
           >
-            VIEW DETAILS
+            {outOfStock ? "UNAVAILABLE" : "VIEW DETAILS"}
           </button>
         </div>
       </div>
