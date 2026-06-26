@@ -162,6 +162,10 @@ export function Hero() {
           transform: scaleX(1.4);
           filter: blur(14px);
         }
+        section { --bottle-h: 260px; }
+        @media (max-width: 768px) {
+          section { --bottle-h: 180px; }
+        }
       `}</style>
       <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 h-full w-full" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#0a0a0a_85%)]" />
