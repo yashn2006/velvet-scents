@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Entrance } from "@/components/luxe/Entrance";
 import { Nav } from "@/components/luxe/Nav";
 import { Hero } from "@/components/luxe/Hero";
 import { Collections } from "@/components/luxe/Collections";
@@ -28,7 +27,6 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-[#f5f0e8]">
-      <Entrance />
       <CustomCursor />
       <AmbientParticles />
       <SectionReveal />
