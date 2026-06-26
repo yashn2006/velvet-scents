@@ -51,13 +51,14 @@ function LoginGate({ onAuth }: { onAuth: () => void }) {
   );
 }
 
-const NAV = [
+type NavItem = { to: string; label: string; exact?: boolean; icon: typeof LayoutDashboard };
+const NAV: NavItem[] = [
   { to: "/admin", label: "Dashboard", exact: true, icon: LayoutDashboard },
   { to: "/admin/orders", label: "Orders", icon: Package },
   { to: "/admin/customers", label: "Customers", icon: Users },
   { to: "/admin/inventory", label: "Inventory", icon: Boxes },
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
-] as const;
+];
 
 function Shell({ onLogout }: { onLogout: () => void }) {
   const router = useRouter();
