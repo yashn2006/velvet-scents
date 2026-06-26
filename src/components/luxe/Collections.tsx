@@ -46,7 +46,15 @@ export function Collections() {
   const scrollBy = (delta: number) => stripRef.current?.scrollBy({ left: delta, behavior: "smooth" });
 
   return (
-    <section ref={sectionRef} id="collections" className="relative bg-[#0a0a0a] py-24">
+    <section
+      ref={sectionRef}
+      id="collections"
+      className="relative py-24"
+      style={{
+        background:
+          "linear-gradient(180deg, #0A0A0A 0%, #0C0600 60%, #0A0A0A 100%)",
+      }}
+    >
       <div className="mx-auto max-w-7xl px-6 text-center">
         <span className="font-accent text-xs text-[#c9a84c]">The House</span>
         <h2 className="font-display mt-3 text-4xl text-[#f5f0e8] md:text-6xl">Our Collections</h2>

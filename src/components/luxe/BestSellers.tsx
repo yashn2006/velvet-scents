@@ -41,7 +41,25 @@ export function BestSellers() {
   const resetPage = () => setPage(1);
 
   return (
-    <section id="shop" className="relative bg-[#0a0a0a] py-24">
+    <section
+      id="shop"
+      className="relative py-24"
+      style={{
+        background:
+          "linear-gradient(180deg, #0A0A0A 0%, #0F0800 50%, #0A0A0A 100%)",
+      }}
+    >
+      {/* subtle gold noise overlay */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          opacity: 0.03,
+          backgroundImage:
+            "radial-gradient(rgba(201,168,76,0.6) 1px, transparent 1px)",
+          backgroundSize: "3px 3px",
+        }}
+      />
       <div className="mx-auto max-w-7xl px-6">
         <div className="text-center">
           <span className="gold-divider font-accent text-xs">Shop The House</span>

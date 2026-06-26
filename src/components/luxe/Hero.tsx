@@ -141,7 +141,13 @@ export function Hero() {
   }, []);
 
   return (
-    <section className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-[#0a0a0a]">
+    <section
+      className="relative isolate flex min-h-screen items-center justify-center overflow-hidden"
+      style={{
+        background:
+          "radial-gradient(ellipse at center, #1A0A00 0%, #0A0A0A 60%, #000000 100%)",
+      }}
+    >
       <style>{`
         @keyframes maison-train-scroll {
           from { transform: translateX(0); }
@@ -170,8 +176,21 @@ export function Hero() {
       <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 h-full w-full" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#0a0a0a_85%)]" />
 
-      {/* Soft ambient glow under the podium */}
-      <div className="pointer-events-none absolute bottom-0 left-1/2 h-[40vh] w-[90vw] max-w-[1100px] -translate-x-1/2 bg-[radial-gradient(ellipse_at_bottom,rgba(180,60,30,0.18),transparent_70%)]" />
+      {/* Deep amber/gold halo behind the bottles on the podium */}
+      <div
+        className="pointer-events-none absolute left-1/2 -translate-x-1/2"
+        style={{
+          bottom: "12%",
+          width: "800px",
+          height: "400px",
+          maxWidth: "92vw",
+          background:
+            "radial-gradient(ellipse at center, rgba(139,94,60,0.45) 0%, rgba(201,168,76,0.18) 35%, transparent 70%)",
+          filter: "blur(8px)",
+        }}
+      />
+      {/* Soft ambient warm wash under the podium */}
+      <div className="pointer-events-none absolute bottom-0 left-1/2 h-[40vh] w-[90vw] max-w-[1100px] -translate-x-1/2 bg-[radial-gradient(ellipse_at_bottom,rgba(180,60,30,0.22),transparent_70%)]" />
 
       {/* PODIUM STAGE */}
       <div ref={podiumRef} className="pointer-events-none absolute inset-x-0 bottom-0 z-10">

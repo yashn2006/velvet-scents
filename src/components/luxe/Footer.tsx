@@ -2,7 +2,13 @@ import { SHOP } from "@/lib/products";
 
 export function Footer() {
   return (
-    <footer className="border-t border-[#c9a84c]/40 bg-[#080808] pt-16 text-[#9a9285]">
+    <footer
+      className="relative border-t border-[#c9a84c]/40 pt-16 text-[#9a9285]"
+      style={{
+        background: "#050505",
+        boxShadow: "0 -1px 40px rgba(201,168,76,0.15)",
+      }}
+    >
       <div className="mx-auto grid max-w-7xl gap-10 px-6 pb-12 md:grid-cols-4">
         <div>
           <h3 className="font-display text-3xl text-[#f5f0e8]">{SHOP.name}</h3>

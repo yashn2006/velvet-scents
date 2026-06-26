@@ -137,6 +137,34 @@
   }
 }
 
+/* ============ Global luxury gradient + glow layer ============ */
+/* Section headings — soft gold glow */
+main section h1.font-display,
+main section h2.font-display,
+main section h3.font-display {
+  text-shadow: 0 0 40px rgba(201, 168, 76, 0.3);
+}
+
+/* Glowing gold divider lines (fallback for plain <hr> or .gold-line) */
+.gold-line {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(90deg, transparent, #c9a84c, transparent);
+  box-shadow: 0 0 16px rgba(201, 168, 76, 0.25);
+}
+
+/* Product card subtle gold gradient at bottom */
+.mo-card::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 45%;
+  background: linear-gradient(180deg, transparent, rgba(201, 168, 76, 0.06));
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 0;
+}
+
 @utility font-display { font-family: var(--font-display); }
 @utility font-accent { font-family: var(--font-accent); letter-spacing: 0.22em; text-transform: uppercase; }
 
@@ -389,8 +417,8 @@ html { scroll-behavior: smooth; }
 /* Section reveal */
 .mo-reveal-child {
   opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(40px);
+  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: opacity, transform;
 }
 .mo-reveal.is-in > .mo-reveal-child {

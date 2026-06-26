@@ -47,8 +47,8 @@ export function ScentStory() {
         onUpdate: (self) => {
           const p = self.progress;
           const c = p < 0.5
-            ? mix("#0a0a0a", "#3d1f00", p * 2)
-            : mix("#3d1f00", "#8b5e3c", (p - 0.5) * 2);
+            ? mix("#0a0500", "#4a1f00", p * 2)
+            : mix("#4a1f00", "#a06028", (p - 0.5) * 2);
           pinTarget.style.backgroundColor = c;
 
           gsap.set(bottleEl, { rotate: p * 360 });
