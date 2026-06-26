@@ -38,6 +38,8 @@ export function Entrance() {
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
     const doorAngle = isMobile ? 100 : 108;
 
+    let safetyTimer: number | undefined;
+
     const ctx = gsap.context(() => {
       const root = rootRef.current!;
       gsap.set(root, { perspective: isMobile ? 800 : 1400 });
@@ -52,23 +54,29 @@ export function Entrance() {
 
         tl.to(".eo-title", { opacity: 1, duration: 0.5, ease: "power2.out" }, 0.3);
 
-        tl.to(".eo-door-left", { rotateY: -doorAngle, duration: 1.5, ease: "power3.inOut" }, 0.6);
-        tl.to(".eo-door-right", { rotateY: doorAngle, duration: 1.5, ease: "power3.inOut" }, 0.6);
-        tl.to(".eo-burst", { scale: 1.2, opacity: 1, duration: 1.5, ease: "power2.out" }, 0.6);
+        tl.to(".eo-door-left", { rotateY: -doorAngle, duration: 1.3, ease: "power3.inOut" }, 0.5);
+        tl.to(".eo-door-right", { rotateY: doorAngle, duration: 1.3, ease: "power3.inOut" }, 0.5);
+        tl.to(".eo-burst", { scale: 1.2, opacity: 1, duration: 1.3, ease: "power2.out" }, 0.5);
 
         // After doors finish opening, fade overlay out so hero shows through
-        tl.to([".eo-doors-layer", ".eo-burst", ".eo-title"], { opacity: 0, duration: 0.5 }, 2.1);
-        tl.to(".eo-backdrop", { opacity: 0, duration: 0.5 }, 2.3);
+        tl.to([".eo-doors-layer", ".eo-burst", ".eo-title"], { opacity: 0, duration: 0.45 }, 1.7);
+        tl.to(".eo-backdrop", { opacity: 0, duration: 0.5 }, 1.9);
 
         // Enable skip after 1.5s
-        gsap.delayedCall(1.5, () => {
+        gsap.delayedCall(1.0, () => {
           skippableRef.current = true;
           setShowSkip(true);
         });
       });
+
+      // Hard safety: never let the overlay block the page for more than 4s.
+      safetyTimer = window.setTimeout(() => {
+        finish();
+      }, 4000);
     }, rootRef);
 
     const finish = () => {
+      if (safetyTimer) window.clearTimeout(safetyTimer);
       sessionStorage.setItem(SESSION_KEY, "true");
       document.body.style.overflow = "auto";
       setActive(false);
@@ -89,6 +97,7 @@ export function Entrance() {
     rootRef.current?.addEventListener("click", onClick);
 
     return () => {
+      if (safetyTimer) window.clearTimeout(safetyTimer);
       ctx.revert();
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = "auto";
