@@ -1,135 +1,193 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { products, type Category, type Product } from "@/lib/products";
+import { products, CATEGORY_LABELS, type Category, type Mood, type Product } from "@/lib/products";
 import { ProductModal } from "./ProductModal";
 
-const FILTERS: ("All" | Category)[] = ["All", "Arabic", "Designer", "Fresh", "Woody", "Limited"];
+const CAT_FILTERS: ("All" | Category)[] = ["All", "Arabic", "Designer", "Fresh", "Woody", "Limited"];
+const MOOD_FILTERS: ("All" | Mood)[] = ["All", "Romantic", "Intense", "Fresh", "Royal", "Mysterious"];
+const PER_PAGE = 9;
 
 export function BestSellers() {
-  const [filter, setFilter] = useState<(typeof FILTERS)[number]>("All");
-  const [sizes, setSizes] = useState<Record<string, 50 | 100>>({});
+  const [cat, setCat] = useState<(typeof CAT_FILTERS)[number]>("All");
+  const [mood, setMood] = useState<(typeof MOOD_FILTERS)[number]>("All");
+  const [page, setPage] = useState(1);
   const [active, setActive] = useState<Product | null>(null);
 
-  const visible = useMemo(
-    () => (filter === "All" ? products : products.filter((p) => p.category === filter)),
-    [filter],
+  const filtered = useMemo(
+    () =>
+      products.filter(
+        (p) =>
+          (cat === "All" || p.category === cat) &&
+          (mood === "All" || p.mood === mood),
+      ),
+    [cat, mood],
   );
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  const safePage = Math.min(page, totalPages);
+  const visible = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE);
+
+  const resetPage = () => setPage(1);
 
   return (
     <section id="shop" className="relative bg-[#0a0a0a] py-24">
       <div className="mx-auto max-w-7xl px-6">
         <div className="text-center">
-          <span className="gold-divider font-accent text-xs">Best Sellers</span>
-          <h2 className="font-display mt-4 text-4xl text-[#f5f0e8] md:text-6xl">The Most Desired</h2>
+          <span className="gold-divider font-accent text-xs">Shop The House</span>
+          <h2 className="font-display mt-4 text-4xl text-[#f5f0e8] md:text-6xl">The Collection</h2>
         </div>
 
+        {/* Category filter */}
         <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
-          {FILTERS.map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`font-accent rounded-sm border px-4 py-2 text-[11px] transition-all ${
-                filter === f
-                  ? "border-[#c9a84c] bg-[#c9a84c] text-[#0a0a0a]"
-                  : "border-[#2a2a2a] text-[#9a9285] hover:border-[#c9a84c] hover:text-[#c9a84c]"
-              }`}
-            >
-              {f}
-            </button>
-          ))}
+          {CAT_FILTERS.map((f) => {
+            const label = f === "All" ? "All" : CATEGORY_LABELS[f];
+            const activeF = cat === f;
+            return (
+              <button
+                key={f}
+                onClick={() => { setCat(f); resetPage(); }}
+                className={`font-accent rounded-sm border px-4 py-2 text-[11px] tracking-[0.2em] transition-all ${
+                  activeF
+                    ? "border-[#c9a84c] bg-[#c9a84c] text-[#0a0a0a]"
+                    : "border-[#c9a84c]/40 bg-[#0a0a0a] text-[#c9a84c] hover:border-[#c9a84c] hover:bg-[#c9a84c]/10"
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
 
-        <motion.div layout className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <AnimatePresence mode="popLayout">
-            {visible.map((p) => {
-              const size = sizes[p.id] ?? 50;
-              const price = size === 50 ? p.price50 : p.price100;
-              return (
-                <motion.article
-                  key={p.id}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.4 }}
-                  onClick={() => setActive(p)}
-                  className="group relative cursor-pointer overflow-hidden rounded-sm border border-[#2a2a2a] bg-[#111111] transition-all duration-500 hover:-translate-y-2 hover:border-[#c9a84c]/40"
-                >
-                  <div className="relative aspect-[3/4] overflow-hidden bg-[#0a0a0a]">
-                    <img src={p.image} alt={p.name} loading="lazy" className="h-full w-full object-contain p-8 transition-transform duration-700 group-hover:scale-105" />
-                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_55%,rgba(0,0,0,0.6))]" />
-                    <div className="absolute inset-x-0 bottom-0 translate-y-full bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/95 to-transparent px-5 pb-5 pt-10 transition-transform duration-500 group-hover:translate-y-0">
-                      <p className="font-accent mb-2 text-[10px] text-[#c9a84c]">Fragrance Notes</p>
-                      <NoteRow label="Top" items={p.notes.top} />
-                      <NoteRow label="Heart" items={p.notes.heart} />
-                      <NoteRow label="Base" items={p.notes.base} />
-                    </div>
-                  </div>
+        {/* Mood filter */}
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+          <span className="font-accent mr-2 text-[10px] tracking-[0.3em] text-[#9a9285]">MOOD</span>
+          {MOOD_FILTERS.map((m) => {
+            const activeF = mood === m;
+            return (
+              <button
+                key={m}
+                onClick={() => { setMood(m); resetPage(); }}
+                className={`font-accent rounded-full border px-3.5 py-1.5 text-[10px] tracking-[0.2em] transition-all ${
+                  activeF
+                    ? "border-[#c9a84c] bg-[#c9a84c] text-[#0a0a0a]"
+                    : "border-[#c9a84c]/30 bg-transparent text-[#c9a84c]/80 hover:border-[#c9a84c] hover:text-[#c9a84c]"
+                }`}
+              >
+                {m}
+              </button>
+            );
+          })}
+        </div>
 
-                  <div className="space-y-3 p-5">
-                    <p className="font-accent text-[10px] text-[#c9a84c]">{p.brand}</p>
-                    <h3 className="font-display text-2xl text-[#f5f0e8]">{p.name}</h3>
-                    <div className="flex items-center justify-between">
-                      <div className="flex gap-1">
-                        {([50, 100] as const).map((s) => (
-                          <button
-                            key={s}
-                            onClick={(e) => { e.stopPropagation(); setSizes((m) => ({ ...m, [p.id]: s })); }}
-                            className={`font-accent rounded-sm border px-2.5 py-1 text-[10px] transition-colors ${
-                              size === s
-                                ? "border-[#c9a84c] text-[#c9a84c]"
-                                : "border-[#2a2a2a] text-[#9a9285] hover:border-[#c9a84c]/60"
-                            }`}
-                          >
-                            {s}ml
-                          </button>
-                        ))}
-                      </div>
-                      <div className="flex items-center gap-1 text-[#c9a84c]">
-                        <Star /> <span className="font-accent text-xs">{p.rating}</span>
-                      </div>
-                    </div>
-                    <p className="font-display text-2xl text-[#c9a84c]">₹{price.toLocaleString("en-IN")}</p>
-                    <div className="flex gap-2 pt-1">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setActive(p); }}
-                        className="btn-ghost-gold flex-1 !py-2.5 !text-[10px]"
-                      >
-                        View Details
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setActive(p); }}
-                        className="btn-gold flex-1 !py-2.5 !text-[10px]"
-                      >
-                        Order Now
-                      </button>
-                    </div>
-                  </div>
-                </motion.article>
+        {/* Grid (3x3) */}
+        <div className="relative mt-12 min-h-[600px]">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`${cat}-${mood}-${safePage}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+            >
+              {visible.map((p) => (
+                <ProductCard key={p.id} product={p} onOpen={() => setActive(p)} />
+              ))}
+              {visible.length === 0 && (
+                <div className="col-span-full py-20 text-center font-accent text-xs tracking-[0.3em] text-[#9a9285]">
+                  NO FRAGRANCES MATCH THIS COMBINATION
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-12 flex items-center justify-center gap-3">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => {
+              const activeF = n === safePage;
+              return (
+                <button
+                  key={n}
+                  onClick={() => setPage(n)}
+                  aria-label={`Page ${n}`}
+                  className={`font-accent h-10 w-10 rounded-sm border text-sm transition-all ${
+                    activeF
+                      ? "border-[#c9a84c] bg-[#c9a84c] text-[#0a0a0a]"
+                      : "border-[#c9a84c]/40 bg-transparent text-[#c9a84c] hover:border-[#c9a84c] hover:bg-[#c9a84c]/10"
+                  }`}
+                >
+                  {n}
+                </button>
               );
             })}
-          </AnimatePresence>
-        </motion.div>
+          </div>
+        )}
       </div>
       <ProductModal product={active} onClose={() => setActive(null)} />
     </section>
   );
 }
 
-function NoteRow({ label, items }: { label: string; items: string[] }) {
+function ProductCard({ product, onOpen }: { product: Product; onOpen: () => void }) {
+  const fromPrice = Math.min(
+    product.inspiredPrice50 ?? product.price50,
+    product.inspiredPrice100 ?? product.price100,
+  );
   return (
-    <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
-      <span className="font-accent w-12 text-[9px] text-[#9a9285]">{label}</span>
-      {items.map((n) => (
-        <span key={n} className="rounded-sm border border-[#2a2a2a] px-2 py-0.5 text-[10px] text-[#f5f0e8]">{n}</span>
-      ))}
-    </div>
+    <article
+      onClick={onOpen}
+      className="mo-card group relative cursor-pointer overflow-hidden"
+      style={{
+        background: "rgba(255,255,255,0.02)",
+        border: "1px solid rgba(201,168,76,0.15)",
+        borderRadius: 16,
+        backdropFilter: "blur(8px)",
+        padding: 24,
+      }}
+    >
+      {/* diagonal glass shine */}
+      <span aria-hidden className="mo-card-shine" />
+
+      {/* Image stage */}
+      <div className="relative mx-auto flex h-[200px] items-center justify-center">
+        <div className="mo-card-glow pointer-events-none absolute inset-0" />
+        <img
+          src={product.image}
+          alt={product.name}
+          loading="lazy"
+          className="mo-card-img relative h-full w-auto max-w-full object-contain transition-transform duration-[400ms] ease-out"
+        />
+      </div>
+
+      <div className="relative mt-5 space-y-2 text-center">
+        <p className="font-accent text-[10px] tracking-[0.3em] text-[#c9a84c]">{product.brand.toUpperCase()}</p>
+        <h3 className="font-display text-[20px] leading-tight text-[#f5f0e8]">{product.name}</h3>
+        <div className="flex items-center justify-center gap-1 text-[#c9a84c]">
+          {Array.from({ length: 5 }, (_, i) => (
+            <Star key={i} filled={i < Math.round(product.rating)} />
+          ))}
+          <span className="font-accent ml-1 text-[10px] text-[#9a9285]">({product.reviews})</span>
+        </div>
+        <p className="font-display text-[18px] text-[#c9a84c]">
+          from ₹{fromPrice.toLocaleString("en-IN")}
+        </p>
+        <div className="pt-2">
+          <button
+            onClick={(e) => { e.stopPropagation(); onOpen(); }}
+            className="mo-card-cta font-accent inline-flex items-center justify-center rounded-sm border border-[#c9a84c] px-5 py-2 text-[10px] tracking-[0.3em] text-[#c9a84c] transition-all hover:bg-[#c9a84c] hover:text-[#0a0a0a]"
+          >
+            VIEW DETAILS
+          </button>
+        </div>
+      </div>
+    </article>
   );
 }
 
-function Star() {
+function Star({ filled = true }: { filled?: boolean }) {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5">
       <path d="M12 2l2.95 6.97L22 10l-5.5 4.78L18.18 22 12 18.27 5.82 22l1.68-7.22L2 10l7.05-1.03L12 2z"/>
     </svg>
   );
