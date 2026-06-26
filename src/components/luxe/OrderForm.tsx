@@ -141,7 +141,14 @@ export function OrderForm() {
   };
 
   return (
-    <section id="order" className="relative bg-[#0a0a0a] py-24">
+    <section
+      id="order"
+      className="relative py-24"
+      style={{
+        background:
+          "linear-gradient(135deg, #0D0500 0%, #0A0A0A 50%, #080010 100%)",
+      }}
+    >
       <div className="mx-auto max-w-3xl px-6">
         <div className="text-center">
           <span className="font-accent text-xs text-[#c9a84c]">Bespoke Service</span>
