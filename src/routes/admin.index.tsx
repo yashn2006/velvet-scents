@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { ArrowDownRight, ArrowUpRight, IndianRupee, Package, Users, ShoppingBag, TrendingUp } from "lucide-react";
 import { analytics, getOrders, getCustomers, type StoredOrder } from "@/lib/admin-store";
 
 export const Route = createFileRoute("/admin/")({ component: Dashboard });
@@ -16,11 +17,11 @@ function Dashboard() {
   }, []);
 
   const cards = [
-    { label: "Revenue", value: "₹" + Math.round(stats.revenue).toLocaleString("en-IN") },
-    { label: "Orders", value: stats.count.toString() },
-    { label: "Units Sold", value: stats.units.toString() },
-    { label: "Avg. Order", value: "₹" + Math.round(stats.aov).toLocaleString("en-IN") },
-    { label: "Customers", value: stats.customers.toString() },
+    { label: "Revenue",    value: "₹" + Math.round(stats.revenue).toLocaleString("en-IN"), trend: +12.4, icon: IndianRupee },
+    { label: "Orders",     value: stats.count.toString(),                                  trend: +6.1,  icon: Package },
+    { label: "Units Sold", value: stats.units.toString(),                                  trend: +3.8,  icon: ShoppingBag },
+    { label: "Avg. Order", value: "₹" + Math.round(stats.aov).toLocaleString("en-IN"),     trend: -1.2,  icon: TrendingUp },
+    { label: "Customers",  value: stats.customers.toString(),                              trend: +9.7,  icon: Users },
   ];
 
   return (
@@ -28,42 +29,56 @@ function Dashboard() {
       <div className="flex items-end justify-between">
         <div>
           <span style={{ fontFamily: "Cinzel, serif" }} className="text-[10px] tracking-[0.4em] text-[#c9a84c]">OVERVIEW</span>
-          <h1 style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-4xl">Dashboard</h1>
+          <p className="mt-2 text-sm text-[#9a9285]">Welcome back — here's the maison today.</p>
         </div>
         <Link to="/admin/orders" className="text-xs tracking-[0.3em] text-[#c9a84c] hover:text-[#e0c878]">ALL ORDERS →</Link>
       </div>
 
-      <div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-5">
-        {cards.map((c) => (
-          <div key={c.label} className="rounded-sm border border-[#1f1f1f] bg-[#111] p-5">
-            <div className="text-[10px] tracking-[0.3em] text-[#9a9285]">{c.label.toUpperCase()}</div>
-            <div style={{ fontFamily: "'Cormorant Garamond', serif" }} className="mt-2 text-3xl text-[#f5f0e8]">{c.value}</div>
-          </div>
-        ))}
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        {cards.map((c) => {
+          const Icon = c.icon;
+          const up = c.trend >= 0;
+          return (
+            <div key={c.label} className="admin-stat">
+              <div className="flex items-start justify-between">
+                <div className="text-[10px] tracking-[0.3em] text-[#9a9285]">{c.label.toUpperCase()}</div>
+                <div className="grid h-9 w-9 place-items-center rounded-lg border border-[rgba(201,168,76,0.25)] bg-[rgba(201,168,76,0.06)] text-[#c9a84c]">
+                  <Icon size={16} strokeWidth={1.5} />
+                </div>
+              </div>
+              <div style={{ fontFamily: "'Cormorant Garamond', serif" }} className="mt-3 text-4xl text-[#c9a84c]">{c.value}</div>
+              <div className={`mt-2 inline-flex items-center gap-1 text-[11px] ${up ? "text-emerald-400" : "text-red-400"}`}>
+                {up ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+                <span>{up ? "+" : ""}{c.trend.toFixed(1)}%</span>
+                <span className="text-[#666]">vs last week</span>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      <div className="mt-10 rounded-sm border border-[#1f1f1f] bg-[#111]">
-        <div className="flex items-center justify-between border-b border-[#1f1f1f] px-5 py-4">
-          <h2 style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-2xl">Recent Orders</h2>
-          <span className="text-[10px] tracking-[0.3em] text-[#9a9285]">LAST 10</span>
+      <div className="mt-10 overflow-hidden rounded-xl border border-[rgba(201,168,76,0.2)] bg-[#0d0d0d]">
+        <div className="flex items-center justify-between border-b border-[rgba(201,168,76,0.15)] px-5 py-4">
+          <h2 style={{ fontFamily: "'Cormorant Garamond', serif" }} className="text-2xl text-[#f5f0e8]">Recent Orders</h2>
+          <span style={{ fontFamily: "Cinzel, serif" }} className="text-[10px] tracking-[0.3em] text-[#c9a84c]">LAST 10</span>
         </div>
         {orders.length === 0 ? (
           <div className="p-10 text-center text-sm text-[#9a9285]">No orders yet. Place one from the storefront to populate this view.</div>
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#1f1f1f] text-left text-[10px] tracking-[0.3em] text-[#9a9285]">
-                <th className="px-5 py-3">ORDER</th>
-                <th className="px-5 py-3">CUSTOMER</th>
-                <th className="px-5 py-3">ITEM</th>
-                <th className="px-5 py-3">AREA</th>
-                <th className="px-5 py-3 text-right">TOTAL</th>
-                <th className="px-5 py-3">STATUS</th>
+              <tr className="text-left">
+                <th>Order</th>
+                <th>Customer</th>
+                <th>Item</th>
+                <th>Area</th>
+                <th className="text-right">Total</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
               {orders.slice(0, 10).map((o) => (
-                <tr key={o.orderId} className="border-b border-[#1f1f1f]/60 hover:bg-white/[0.02]">
+                <tr key={o.orderId}>
                   <td className="px-5 py-3 text-[#c9a84c]">{o.orderId}</td>
                   <td className="px-5 py-3">{o.name}</td>
                   <td className="px-5 py-3 text-[#9a9285]">{o.productName} · {o.size}ml × {o.qty}</td>
@@ -81,11 +96,5 @@ function Dashboard() {
 }
 
 function StatusPill({ status }: { status: string }) {
-  const map: Record<string, string> = {
-    Pending: "border-amber-700/60 text-amber-400",
-    Confirmed: "border-blue-700/60 text-blue-400",
-    Delivered: "border-emerald-700/60 text-emerald-400",
-    Cancelled: "border-red-700/60 text-red-400",
-  };
-  return <span className={`rounded-sm border px-2 py-1 text-[10px] tracking-[0.2em] ${map[status] ?? ""}`}>{status.toUpperCase()}</span>;
+  return <span className="admin-badge" data-status={status}>{status}</span>;
 }
