@@ -23,10 +23,8 @@ export function SectionReveal() {
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
-          if (e.isIntersecting) {
-            e.target.classList.add("is-in");
-            io.unobserve(e.target);
-          }
+          if (e.isIntersecting) e.target.classList.add("is-in");
+          else e.target.classList.remove("is-in");
         }
       },
       { threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
