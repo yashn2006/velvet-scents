@@ -3,20 +3,6 @@ import { gsap } from "gsap";
 
 const SESSION_KEY = "entrancePlayed";
 
-function preload(urls: string[]) {
-  return Promise.all(
-    urls.map(
-      (u) =>
-        new Promise<void>((resolve) => {
-          const img = new Image();
-          img.onload = () => resolve();
-          img.onerror = () => resolve();
-          img.src = u;
-        }),
-    ),
-  );
-}
-
 export function Entrance() {
   const [active, setActive] = useState<boolean>(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
