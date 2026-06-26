@@ -9,6 +9,8 @@ import { OrderForm } from "@/components/luxe/OrderForm";
 import { Reviews } from "@/components/luxe/Reviews";
 import { Footer } from "@/components/luxe/Footer";
 import { FloatingButtons } from "@/components/luxe/FloatingButtons";
+import { CustomCursor } from "@/components/luxe/CustomCursor";
+import { SectionReveal } from "@/components/luxe/SectionReveal";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -26,6 +28,8 @@ function Index() {
   return (
     <main className="min-h-screen bg-[#0a0a0a] text-[#f5f0e8]">
       <LoadingScreen />
+      <CustomCursor />
+      <SectionReveal />
       <Nav />
       <Hero />
       <ScentStory />
