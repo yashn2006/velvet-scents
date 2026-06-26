@@ -142,6 +142,7 @@ export function Hero() {
 
   return (
     <section
+      id="hero"
       className="relative isolate flex min-h-screen items-center justify-center overflow-hidden"
       style={{
         background:
