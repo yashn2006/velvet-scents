@@ -8,10 +8,13 @@ export function LaunchIntro() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (sessionStorage.getItem("launched") === "true") {
-      document.querySelector(".hero-section")?.classList.add("visible");
-      return;
-    }
+    // Always play on every page load / refresh, and start at the top.
+    try {
+      if ("scrollRestoration" in window.history) {
+        window.history.scrollRestoration = "manual";
+      }
+      window.scrollTo(0, 0);
+    } catch {}
     setShow(true);
     const t1 = setTimeout(() => {
       setFadeOut(true);
@@ -19,7 +22,6 @@ export function LaunchIntro() {
     }, 2000);
     const t2 = setTimeout(() => {
       setShow(false);
-      sessionStorage.setItem("launched", "true");
     }, 2600);
     return () => {
       clearTimeout(t1);
