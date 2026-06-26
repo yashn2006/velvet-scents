@@ -34,7 +34,7 @@ export function Entrance() {
     document.body.style.overflow = "hidden";
 
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
-    const doorAngle = isMobile ? 100 : 108;
+    const slideDistance = isMobile ? "-55vw" : "-60vw";
 
     let safetyTimer: number | undefined;
 
