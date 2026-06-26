@@ -395,6 +395,12 @@ html { scroll-behavior: smooth; }
   color: #f5f0e8;
 }
 
+/* Admin main content area — never overlaps the fixed sidebar */
+.admin-main { margin-left: 0; width: 100%; }
+@media (min-width: 768px) {
+  .admin-main { margin-left: 260px; width: calc(100vw - 260px); }
+}
+
 /* Sidebar nav items */
 .admin-nav-item {
   display: flex;
