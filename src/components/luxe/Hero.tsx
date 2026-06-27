@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import khamrah from "@/assets/bottles/khamrah.avif.asset.json";
-import adgProfumo from "@/assets/bottles/adg-profumo.avif.asset.json";
-import cdnim from "@/assets/bottles/cdnim.avif.asset.json";
-import adgParfum from "@/assets/bottles/adg-parfum.avif.asset.json";
-import oudGlory from "@/assets/bottles/oud-glory.avif.asset.json";
-import sauvage from "@/assets/bottles/sauvage.avif.asset.json";
 import { SHOP } from "@/lib/products";
+
+const khamrah = { url: "/bottles/khamrah-waha.png" };
+const adgProfumo = { url: "/bottles/acqua-profumo.png" };
+const cdnim = { url: "/bottles/club-de-nuit.png" };
+const adgParfum = { url: "/bottles/acqua-parfum.png" };
+const oudGlory = { url: "/bottles/oud-for-glory.png" };
+const sauvage = { url: "/bottles/sauvage-elixir.png" };
 
 const PODIUM_BOTTLES = [
   { src: khamrah.url, name: "Lattafa Khamrah Waha" },
