@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
-import oud from "@/assets/collection-oud.jpg";
-import designer from "@/assets/collection-designer.jpg";
-import floral from "@/assets/collection-floral.jpg";
-import limited from "@/assets/collection-limited.jpg";
-import woody from "@/assets/collection-woody.jpg";
+const oud = "/collections/collection-oud.jpg";
+const designer = "/collections/collection-designer.jpg";
+const floral = "/collections/collection-floral.jpg";
+const limited = "/collections/collection-limited.jpg";
+const woody = "/collections/collection-woody.jpg";
 
 const CARDS = [
   { name: "Arabic Oud", img: oud },
