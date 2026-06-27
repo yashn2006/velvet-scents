@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import bottle from "@/assets/bottle-1.png";
+const bottle = "/bottles/bottle-1.png";
 
 const LINES = [
   "Born in the souks of Arabia.",
