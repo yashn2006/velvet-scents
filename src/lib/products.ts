@@ -1,6 +1,12 @@
-const bottle1 = "/bottles/bottle-1.png";
-const bottle2 = "/bottles/bottle-2.png";
-const bottle3 = "/bottles/bottle-3.png";
+const khamrah = "/bottles/khamrah-waha.png";
+const acquaProfumo = "/bottles/acqua-profumo.png";
+const clubDeNuit = "/bottles/club-de-nuit.png";
+const acquaParfum = "/bottles/acqua-parfum.png";
+const oudGlory = "/bottles/oud-for-glory.png";
+const sauvage = "/bottles/sauvage-elixir.png";
+const bottle1 = acquaParfum;
+const bottle2 = sauvage;
+const bottle3 = oudGlory;
 
 export type Category = "Arabic" | "Designer" | "Fresh" | "Woody" | "Limited";
 export type Mood = "Romantic" | "Intense" | "Fresh" | "Royal" | "Mysterious";
