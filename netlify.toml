@@ -1,0 +1,3 @@
+[build]
+  command = "mkdir -p .tanstack/tmp && chmod -R a+rw .tanstack || true && bun run build"
+  publish = "dist/client"
