@@ -1,15 +1,7 @@
-const lattafaQahwa = "/bottles/lattafa-khamrah-qahwa.png";
-const lattafaWaha = "/bottles/lattafa-khamrah-waha.png";
-const lattafaKhamrah = "/bottles/lattafa-khamrah.png";
-const acquaProfumo = "/bottles/acqua-profumo.png";
-const clubDeNuit = "/bottles/club-de-nuit.png";
-const acquaParfum = "/bottles/acqua-parfum.png";
-const oudGlory = "/bottles/oud-for-glory.png";
-const sauvage = "/bottles/sauvage-elixir.png";
-// aliases used across the catalogue
-const bottle1 = lattafaQahwa;
-const bottle2 = lattafaWaha;
-const bottle3 = lattafaKhamrah;
+// All bottle images live in /public/bottles so they ship as static files.
+const bottle1 = "/bottles/lattafa-khamrah-qahwa.png";
+const bottle2 = "/bottles/lattafa-khamrah-waha.png";
+const bottle3 = "/bottles/lattafa-khamrah.png";
 
 export type Category = "Arabic" | "Designer" | "Fresh" | "Woody" | "Limited";
 export type Mood = "Romantic" | "Intense" | "Fresh" | "Royal" | "Mysterious";
