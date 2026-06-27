@@ -1,6 +1,6 @@
-import bottle1 from "@/assets/bottle-1.png";
-import bottle2 from "@/assets/bottle-2.png";
-import bottle3 from "@/assets/bottle-3.png";
+const bottle1 = "/bottles/bottle-1.png";
+const bottle2 = "/bottles/bottle-2.png";
+const bottle3 = "/bottles/bottle-3.png";
 
 export type Category = "Arabic" | "Designer" | "Fresh" | "Woody" | "Limited";
 export type Mood = "Romantic" | "Intense" | "Fresh" | "Royal" | "Mysterious";
