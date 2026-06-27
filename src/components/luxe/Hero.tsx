@@ -1,20 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { SHOP } from "@/lib/products";
 
-const khamrah = { url: "/bottles/khamrah-waha.png" };
-const adgProfumo = { url: "/bottles/acqua-profumo.png" };
-const cdnim = { url: "/bottles/club-de-nuit.png" };
-const adgParfum = { url: "/bottles/acqua-parfum.png" };
-const oudGlory = { url: "/bottles/oud-for-glory.png" };
-const sauvage = { url: "/bottles/sauvage-elixir.png" };
-
 const PODIUM_BOTTLES = [
-  { src: khamrah.url, name: "Lattafa Khamrah Waha" },
-  { src: adgProfumo.url, name: "Acqua di Gio Profumo" },
-  { src: cdnim.url, name: "Club de Nuit Intense" },
-  { src: adgParfum.url, name: "Acqua di Gio Parfum" },
-  { src: oudGlory.url, name: "Lattafa Oud For Glory" },
-  { src: sauvage.url, name: "Dior Sauvage Elixir" },
+  { src: "/bottles/lattafa-khamrah-qahwa.png", name: "Lattafa Khamrah Qahwa" },
+  { src: "/bottles/lattafa-khamrah-waha.png", name: "Lattafa Khamrah Waha" },
+  { src: "/bottles/lattafa-khamrah.png", name: "Lattafa Khamrah" },
+  { src: "/bottles/acqua-profumo.png", name: "Acqua di Gio Profumo" },
+  { src: "/bottles/club-de-nuit.png", name: "Club de Nuit Intense" },
+  { src: "/bottles/oud-for-glory.png", name: "Lattafa Oud For Glory" },
+  { src: "/bottles/sauvage-elixir.png", name: "Dior Sauvage Elixir" },
 ];
 // duplicate the list once for seamless infinite loop
 const TRAIN = [...PODIUM_BOTTLES, ...PODIUM_BOTTLES];
